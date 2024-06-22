@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreightBooks Companion - Advanced Freight Management</title>
+    <meta name="description" content="Experience efficient and advanced freight management with FreightBooks Companion!">
+    <link rel="preload" href="dist/styles.css" as="style">
+    <link rel="preload" href="dist/vendor.js" as="script">
+    <link rel="preload" href="dist/app.js" as="script">
+    <link rel="stylesheet" href="dist/styles.css">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.1/tippy.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.example.com https://api.openweathermap.org https://api.exchangerate-api.com;">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/2.1.0/fingerprint2.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/3.18.0/tf.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.1/tippy.umd.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/OutlinePass.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/FXAAShader.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/speech-commands" defer></script>
+    <style>
+        /* Custom styles for an amazing, feature-rich experience */
+        body {
+            background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+            color: #f0f0f0;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        #app-container {
+            display: grid;
+            grid-template-columns: 250px 1fr 250px;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100vh;
+            gap: 20px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        #main-nav {
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        #main-nav ul {
+            display: flex;
+            justify-content: space-around;
+            list-style-type: none;
+            padding: 0;
+            flex-wrap: wrap;
+        }
+
+        #main-nav li {
+            margin: 5px;
+        }
+
+        #main-nav a {
+            color: #f0f0f0;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+
+        #main-nav a:hover {
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            max-height: calc(100vh - 40px);
+        }
+
+        .sidebar:hover {
+            transform: scale(1.05);
+        }
+
+        #content-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        #3d-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #content {
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+        }
+
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .notification {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            padding: 10px 20px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        #theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 9999;
+            transition: transform 0.3s ease;
+        }
+
+        #theme-toggle:hover {
+            transform: scale(1.2) rotate(360deg);
+        }
+
+        .dark-theme {
+            background: linear-gradient(45deg, #000000, #1a1a1a);
+            color: #00ff00;
+        }
+
+        /* New styles for additional features */
+        #weather-widget {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        #currency-converter {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        #chat-widget {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            z-index: 9998;
+            width: 300px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        #chat-messages {
+            height: 200px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+
+        #chat-input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #f0f0f0;
+            margin-bottom: 10px;
+        }
+
+        #send-chat {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #00ff00;
+            color: #1a1a1a;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        #send-chat:hover {
+            background: #00cc00;
+        }
+
+        #voice-commands {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 9998;
+        }
+
+        #augmented-reality {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 9998;
+        }
+
+        #analytics-dashboard {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        #ai-assistant {
+            position: fixed;
+            bottom: 20px;
+            right: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 9998;
+        }
+
+        #blockchain-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        #iot-dashboard {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        #machine-learning-predictions {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        #virtual-reality {
+            position: fixed;
+            bottom: 140px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 9998;
+        }
+
+        /* Add more custom styles as needed */
+    </style>
+</head>
+<body>
+    <header id="smart-header">
+        <nav>
+            <ul>
+                <li><a href="index.html" data-tippy-content="Home Dashboard">Dashboard</a></li>
+                <li><a href="Shipments.html" data-tippy-content="Manage Your Shipments">Shipments</a></li>
+                <li><a href="Reports.html" data-tippy-content="View Detailed Reports">Reports</a></li>
+                <li><a href="Partners.html" data-tippy-content="Manage Your Partners">Partners</a></li>
+                <li><a href="Intergrations.html" data-tippy-content="Manage Integrations">Integrations</a></li>
+                <li><a href="Email.html" data-tippy-content="Email Management">Email</a></li>
+                <li><a href="Settings.html" data-tippy-content="Adjust Your Settings">Settings</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div id="app-container">
+        <nav id="main-nav">
+            <ul>
+                <li><a href="#home" data-tippy-content="Go to Home">Home</a></li>
+                <li><a href="#shipments" data-tippy-content="Manage Shipments">Shipments</a></li>
+                <li><a href="#tracking" data-tippy-content="Track Your Freight">Tracking</a></li>
+                <li><a href="#reports" data-tippy-content="View Reports">Reports</a></li>
+                <li><a href="#settings" data-tippy-content="Adjust Settings">Settings</a></li>
+                <li><a href="#analytics" data-tippy-content="View Analytics">Analytics</a></li>
+                <li><a href="#support" data-tippy-content="Get Support">Support</a></li>
+                <li><a href="#ai-insights" data-tippy-content="AI-Powered Insights">AI Insights</a></li>
+                <li><a href="#blockchain" data-tippy-content="Blockchain Integration">Blockchain</a></li>
+                <li><a href="#iot" data-tippy-content="IoT Dashboard">IoT</a></li>
+                <li><a href="#ml-predictions" data-tippy-content="Machine Learning Predictions">ML Predictions</a></li>
+                <li><a href="#vr-experience" data-tippy-content="Virtual Reality Experience">VR Experience</a></li>
+            </ul>
+        </nav>
+        <aside id="left-sidebar" class="sidebar">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="#new-shipment" data-tippy-content="Create a New Shipment">New Shipment</a></li>
+                <li><a href="#pending-approvals" data-tippy-content="View Pending Approvals">Pending Approvals</a></li>
+                <li><a href="#recent-activity" data-tippy-content="Check Recent Activity">Recent Activity</a></li>
+            </ul>
+            <div id="weather-widget">
+                <h4>Weather</h4>
+                <p id="weather-data">Loading weather data...</p>
+            </div>
+            <div id="currency-converter">
+                <h4>Currency Converter</h4>
+                <input type="number" id="amount" placeholder="Amount">
+                <select id="from-currency">
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                </select>
+                <select id="to-currency">
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                </select>
+                <button id="convert-currency">Convert</button>
+                <p id="conversion-result"></p>
+            </div>
+        </aside>
+        <main id="content-wrapper">
+            <div id="3d-container"></div>
+            <div id="content">
+                <h1>Welcome to FreightBooks Companion</h1>
+                <p>This is a placeholder for the main content. The actual content will be dynamically loaded based on user interactions.</p>
+                <button class="btn" id="sound-button">Click me for sound!</button>
+            </div>
+        </main>
+        <aside id="right-sidebar" class="sidebar">
+            <h3>Notifications</h3>
+            <div id="notifications-list"></div>
+        </aside>
+        <footer>
+            <p>&copy; 2023 FreightBooks Companion. All rights reserved.</p>
+        </footer>
+    </div>
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+    <div id="notification-container"></div>
+    <button id="theme-toggle" data-tippy-content="Toggle Dark/Light Mode">🌓</button>
+    <div id="chat-widget">
+        <h4>Chat Support</h4>
+        <div id="chat-messages"></div>
+        <input type="text" id="chat-input" placeholder="Type your message...">
+        <button id="send-chat">Send</button>
+    </div>
+    <div id="voice-commands" data-tippy-content="Voice Commands">🎤</div>
+    <div id="augmented-reality" data-tippy-content="Augmented Reality">AR</div>
+    <script src="/dist/vendor.js" defer></script>
+    <script src="/dist/app.js" defer></script>
+    <script src="/js/app.js" defer></script>
+    <script>
+        // Use async functions to avoid blocking
+        async function loadWeatherData() {
+            try {
+                const response = await fetch('/api/weather');
+                const data = await response.json();
+                document.getElementById('weather-data').textContent = `${data.temperature}°C, ${data.condition}`;
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+            }
+        }
+
+        async function convertCurrency() {
+            const amount = document.getElementById('amount').value;
+            const fromCurrency = document.getElementById('from-currency').value;
+            const toCurrency = document.getElementById('to-currency').value;
+            try {
+                const response = await fetch(`/api/convert-currency?amount=${amount}&from=${fromCurrency}&to=${toCurrency}`);
+                const data = await response.json();
+                document.getElementById('conversion-result').textContent = `${amount} ${fromCurrency} = ${data.result} ${toCurrency}`;
+            } catch (error) {
+                console.error('Error converting currency:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadWeatherData();
+            document.getElementById('convert-currency').addEventListener('click', convertCurrency);
+            document.getElementById('sound-button').addEventListener('click', () => {
+                // Use Web Audio API for non-blocking sound playback
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                oscillator.connect(audioContext.destination);
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.5);
+            });
+        });
+    </script>
+</body>
+</html>

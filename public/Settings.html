@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreightBooks Companion - Settings</title>
+    <meta name="description" content="Configure your FreightBooks Companion settings for optimal performance and customization.">
+    <link rel="preload" href="dist/styles.css" as="style">
+    <link rel="preload" href="dist/vendor.js" as="script">
+    <link rel="preload" href="dist/app.js" as="script">
+    <link rel="stylesheet" href="dist/styles.css">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.1/tippy.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.example.com;">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.1/tippy.umd.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+</head>
+<body>
+    <div id="app-container">
+        <header>
+            <!-- Include the smart-header.html content here -->
+        </header>
+        <main>
+            <h1>Settings</h1>
+            <!-- Add your settings content here -->
+        </main>
+        <footer>
+            <!-- Add your footer content here -->
+        </footer>
+    </div>
+    <script src="dist/vendor.js"></script>
+    <script src="dist/app.js"></script>
+    <script>
+        // Add any page-specific JavaScript here
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize tooltips
+            tippy('[data-tippy-content]', {
+                arrow: true,
+                delay: [50, 0],
+                theme: 'light-border',
+            });
+
+            // Add GSAP animations
+            gsap.from('main', { duration: 0.5, opacity: 0, y: 50, ease: 'power2.out' });
+        });
+    </script>
+</body>
+</html>
+</head>
+<body>
+    <div id="app-container">
+        <header>
+            <div class="logo">
+                <img src="logo.png" alt="Freight Companion Logo">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Dashboard</a></li>
+                    <li><a href="shipments.html">Shipments</a></li>
+                    <li><a href="tracking.html">Tracking</a></li>
+                    <li><a href="reports.html">Reports</a></li>
+                    <li><a href="#" class="active">Settings</a></li>
+                </ul>
+            </nav>
+            <div class="user-info">
+                <span>Welcome, John Doe</span>
+                <img src="user-avatar.png" alt="User Avatar">
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <aside class="left-panel">
+                <h3>Quick Actions</h3>
+                <ul id="settings-tabs">
+                    <li><a href="#core-settings" class="active">Core Settings</a></li>
+                    <li><a href="#e-reporting-settings">E-Reporting Settings</a></li>
+                    <li><a href="#ai-settings">AI Settings</a></li>
+                    <li><a href="#integration-settings">Integration Settings</a></li>
+                    <li><a href="#security-settings">Security Settings</a></li>
+                    <li><a href="#notification-settings">Notification Settings</a></li>
+                    <li><a href="#financial-settings">Financial Settings</a></li>
+                    <li><a href="#analytics-settings">Analytics Settings</a></li>
+                </ul>
+            </aside>
+
+            <main>
+                <h1>Settings</h1>
+
+                <div id="settings-content">
+                    <section id="core-settings" class="settings-section active">
+                        <h2>Core Freight Companion Functionality Settings</h2>
+                        <form id="core-settings-form">
+                            <label for="company-name">Company Name:</label>
+                            <input type="text" id="company-name" name="company-name" required>
+                            
+                            <label for="default-currency">Default Currency:</label>
+                            <select id="default-currency" name="default-currency">
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                                <option value="GBP">GBP</option>
+                            </select>
+                            
+                            <label for="time-zone">Time Zone:</label>
+                            <select id="time-zone" name="time-zone">
+                                <option value="UTC">UTC</option>
+                                <option value="EST">EST</option>
+                                <option value="PST">PST</option>
+                            </select>
+                            
+                            <button type="submit">Save Core Settings</button>
+                        </form>
+                    </section>
+
+                    <section id="e-reporting-settings" class="settings-section">
+                        <h2>E-Reporting and Compliance Settings</h2>
+                        <form id="e-reporting-form">
+                            <label for="enable-e-reporting">Enable E-Reporting:</label>
+                            <input type="checkbox" id="enable-e-reporting" name="enable-e-reporting">
+                            
+                            <label for="reporting-frequency">Reporting Frequency:</label>
+                            <select id="reporting-frequency" name="reporting-frequency">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                            
+                            <label for="compliance-standard">Compliance Standard:</label>
+                            <select id="compliance-standard" name="compliance-standard">
+                                <option value="ISO9001">ISO 9001</option>
+                                <option value="GDPR">GDPR</option>
+                                <option value="CCPA">CCPA</option>
+                            </select>
+                            
+                            <button type="submit">Save E-Reporting Settings</button>
+                        </form>
+                    </section>
+
+                    <section id="ai-settings" class="settings-section">
+                        <h2>AI-Powered Tools Settings</h2>
+                        <form id="ai-settings-form">
+                            <label for="enable-ai-predictions">Enable AI Predictions:</label>
+                            <input type="checkbox" id="enable-ai-predictions" name="enable-ai-predictions">
+                            
+                            <label for="ai-model">AI Model:</label>
+                            <select id="ai-model" name="ai-model">
+                                <option value="basic">Basic</option>
+                                <option value="advanced">Advanced</option>
+                                <option value="expert">Expert</option>
+                            </select>
+                            
+                            <label for="prediction-confidence">Minimum Prediction Confidence (%):</label>
+                            <input type="range" id="prediction-confidence" name="prediction-confidence" min="0" max="100" step="1">
+                            
+                            <button type="submit">Save AI Settings</button>
+                        </form>
+                    </section>
+
+                    <section id="integration-settings" class="settings-section">
+                        <h2>Third-Party Integration Settings</h2>
+                        <form id="integration-settings-form">
+                            <label for="enable-crm-integration">Enable CRM Integration:</label>
+                            <input type="checkbox" id="enable-crm-integration" name="enable-crm-integration">
+                            
+                            <label for="crm-provider">CRM Provider:</label>
+                            <select id="crm-provider" name="crm-provider">
+                                <option value="salesforce">Salesforce</option>
+                                <option value="hubspot">HubSpot</option>
+                                <option value="zoho">Zoho</option>
+                            </select>
+                            
+                            <label for="api-key">API Key:</label>
+                            <input type="password" id="api-key" name="api-key">
+                            
+                            <button type="submit">Save Integration Settings</button>
+                        </form>
+                    </section>
+
+                    <section id="security-settings" class="settings-section">
+                        <h2>Security and Access Control Settings</h2>
+                        <form id="security-settings-form">
+                            <label for="two-factor-auth">Enable Two-Factor Authentication:</label>
+                            <input type="checkbox" id="two-factor-auth" name="two-factor-auth">
+                            
+                            <label for="password-expiry">Password Expiry (days):</label>
+                            <input type="number" id="password-expiry" name="password-expiry" min="30" max="365">
+                            
+                            <label for="session-timeout">Session Timeout (minutes):</label>
+                            <input type="number" id="session-timeout" name="session-timeout" min="5" max="120">
+                            
+                            <button type="submit">Save Security Settings</button>
+                        </form>
+                    </section>
+
+                    <section id="notification-settings" class="settings-section">
+                        <h2>Notification Settings</h2>
+                        <form id="notification-settings-form">
+                            <label for="email-notifications">Enable Email Notifications:</label>
+                            <input type="checkbox" id="email-notifications" name="email-notifications">
+                            
+                            <label for="sms-notifications">Enable SMS Notifications:</label>
+                            <input type="checkbox" id="sms-notifications" name="sms-notifications">
+                            
+                            <label for="push-notifications">Enable Push Notifications:</label>
+                            <input type="checkbox" id="push-notifications" name="push-notifications">
+                            
+                            <button type="submit">Save Notification Settings</button>
+                        </form>
+                    </section>
+
+                    <section id="financial-settings" class="settings-section">
+                        <h2>Financial Settings</h2>
+                        <form id="financial-settings-form">
+                            <label for="default-tax-rate">Default Tax Rate (%):</label>
+                            <input type="number" id="default-tax-rate" name="default-tax-rate" min="0" max="100" step="0.1">
+                            
+                            <label for="invoice-due-days">Invoice Due Days:</label>
+                            <input type="number" id="invoice-due-days" name="invoice-due-days" min="1" max="90">
+                            
+                            <label for="payment-gateway">Payment Gateway:</label>
+                            <select id="payment-gateway" name="payment-gateway">
+                                <option value="stripe">Stripe</option>
+                                <option value="paypal">PayPal</option>
+                                <option value="square">Square</option>
+                            </select>
+                            
+                            <button type="submit">Save Financial Settings</button>
+                        </form>
+                    </section>
+
+                    <section id="analytics-settings" class="settings-section">
+                        <h2>Analytics Settings</h2>
+                        <form id="analytics-settings-form">
+                            <label for="enable-google-analytics">Enable Google Analytics:</label>
+                            <input type="checkbox" id="enable-google-analytics" name="enable-google-analytics">
+                            
+                            <label for="google-analytics-id">Google Analytics ID:</label>
+                            <input type="text" id="google-analytics-id" name="google-analytics-id">
+                            
+                            <label for="data-retention-period">Data Retention Period (months):</label>
+                            <input type="number" id="data-retention-period" name="data-retention-period" min="1" max="60">
+                            
+                            <button type="submit">Save Analytics Settings</button>
+                        </form>
+                    </section>
+                </div>
+            </main>
+
+            <aside class="right-panel">
+                <div class="weather-widget">
+                    <h3>Weather</h3>
+                    <div id="weather-data">
+                        <!-- Weather data will be populated here -->
+                    </div>
+                </div>
+                <div class="currency-converter">
+                    <h3>Currency Converter</h3>
+                    <form id="currency-converter-form">
+                        <input type="number" id="amount" placeholder="Amount">
+                        <select id="from-currency">
+                            <!-- Currency options -->
+                        </select>
+                        <select id="to-currency">
+                            <!-- Currency options -->
+                        </select>
+                        <button type="submit">Convert</button>
+                    </form>
+                    <div id="conversion-result"></div>
+                </div>
+            </aside>
+        </div>
+
+        <footer>
+            <p>&copy; 2023 Freight Companion. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="/js/settings.js"></script>
+</body>
+</html>

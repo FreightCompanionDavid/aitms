@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreightBooks Companion - Customer Management</title>
+    <link rel="stylesheet" href="/dist/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@9.0.1/dist/handsontable.full.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/handsontable@9.0.1/dist/handsontable.full.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app-container">
+        <header>
+            <h1>FreightBooks Companion Customer Management</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#" class="active">Customers</a></li>
+                    <!-- Add more navigation items as needed -->
+                </ul>
+            </nav>
+        </header>
+        
+        <main>
+            <section id="customer-management">
+                <h2>Customer Management</h2>
+                <div id="customer-actions">
+                    <button id="add-customer">Add New Customer</button>
+                    <button id="import-customers">Import Customers</button>
+                    <button id="export-customers">Export Customers</button>
+                    <button id="open-excel-view">Open Excel-like View</button>
+                </div>
+                <div id="customer-search">
+                    <input type="text" id="search-input" placeholder="Search customers...">
+                    <button id="search-button">Search</button>
+                </div>
+                <table id="customer-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customer-list">
+                        <!-- Customer rows will be dynamically added here -->
+                    </tbody>
+                </table>
+            </section>
+            
+            <div id="customer-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2 id="modal-title">Add/Edit Customer</h2>
+                    <form id="customer-form">
+                        <input type="hidden" id="customer-id">
+                        <label for="customer-name">Name:</label>
+                        <input type="text" id="customer-name" required>
+                        <label for="customer-email">Email:</label>
+                        <input type="email" id="customer-email" required>
+                        <label for="customer-phone">Phone:</label>
+                        <input type="tel" id="customer-phone" required>
+                        <button type="submit">Save Customer</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="excel-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Excel-like View</h2>
+                    <div id="excel-container"></div>
+                    <button id="save-excel-data">Save Changes</button>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2023 FreightBooks Companion. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Customer management logic
+        let customers = [];
+        let hot; // Handsontable instance
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCustomers();
+            setupEventListeners();
+        });
+
+        function loadCustomers() {
+            // Simulating API call to fetch customers
+            setTimeout(() => {
+                customers = [
+                    { id: 1, name: 'Acme Corp', email: 'contact@acme.com', phone: '123-456-7890' },
+                    { id: 2, name: 'Global Logistics', email: 'info@globallogistics.com', phone: '987-654-3210' },
+                    // Add more mock customers as needed
+                ];
+                renderCustomerTable();
+            }, 500);
+        }
+
+        function renderCustomerTable() {
+            const customerList = document.getElementById('customer-list');
+            customerList.innerHTML = '';
+            customers.forEach(customer => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${customer.id}</td>
+                    <td>${customer.name}</td>
+                    <td>${customer.email}</td>
+                    <td>${customer.phone}</td>
+                    <td>
+                        <button class="edit-customer" data-id="${customer.id}">Edit</button>
+                        <button class="delete-customer" data-id="${customer.id}">Delete</button>
+                    </td>
+                `;
+                customerList.appendChild(row);
+            });
+        }
+
+        function setupEventListeners() {
+            document.getElementById('add-customer').addEventListener('click', showAddCustomerModal);
+            document.getElementById('import-customers').addEventListener('click', importCustomers);
+            document.getElementById('export-customers').addEventListener('click', exportCustomers);
+            document.getElementById('search-button').addEventListener('click', searchCustomers);
+            document.getElementById('customer-form').addEventListener('submit', saveCustomer);
+            document.querySelectorAll('.close').forEach(el => el.addEventListener('click', closeModal));
+            document.getElementById('customer-list').addEventListener('click', handleCustomerActions);
+            document.getElementById('open-excel-view').addEventListener('click', openExcelView);
+            document.getElementById('save-excel-data').addEventListener('click', saveExcelData);
+        }
+
+        function showAddCustomerModal() {
+            document.getElementById('modal-title').textContent = 'Add New Customer';
+            document.getElementById('customer-id').value = '';
+            document.getElementById('customer-form').reset();
+            showModal('customer-modal');
+        }
+
+        function showEditCustomerModal(customerId) {
+            const customer = customers.find(c => c.id === parseInt(customerId));
+            if (customer) {
+                document.getElementById('modal-title').textContent = 'Edit Customer';
+                document.getElementById('customer-id').value = customer.id;
+                document.getElementById('customer-name').value = customer.name;
+                document.getElementById('customer-email').value = customer.email;
+                document.getElementById('customer-phone').value = customer.phone;
+                showModal('customer-modal');
+            }
+        }
+
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            gsap.to(modal, { duration: 0.3, opacity: 1, display: 'block', ease: 'power2.inOut' });
+        }
+
+        function closeModal() {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                gsap.to(modal, { duration: 0.3, opacity: 0, display: 'none', ease: 'power2.inOut' });
+            });
+        }
+
+        function saveCustomer(e) {
+            e.preventDefault();
+            const customerId = document.getElementById('customer-id').value;
+            const customerData = {
+                name: document.getElementById('customer-name').value,
+                email: document.getElementById('customer-email').value,
+                phone: document.getElementById('customer-phone').value
+            };
+
+            if (customerId) {
+                // Update existing customer
+                const index = customers.findIndex(c => c.id === parseInt(customerId));
+                if (index !== -1) {
+                    customers[index] = { ...customers[index], ...customerData };
+                }
+            } else {
+                // Add new customer
+                const newId = customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1;
+                customers.push({ id: newId, ...customerData });
+            }
+
+            renderCustomerTable();
+            closeModal();
+        }
+
+        function handleCustomerActions(e) {
+            if (e.target.classList.contains('edit-customer')) {
+                showEditCustomerModal(e.target.dataset.id);
+            } else if (e.target.classList.contains('delete-customer')) {
+                deleteCustomer(e.target.dataset.id);
+            }
+        }
+
+        function deleteCustomer(customerId) {
+            if (confirm('Are you sure you want to delete this customer?')) {
+                customers = customers.filter(c => c.id !== parseInt(customerId));
+                renderCustomerTable();
+            }
+        }
+
+        function importCustomers() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.xlsx, .xls, .csv';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    const data = new Uint8Array(event.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                    
+                    // Process and add imported customers
+                    jsonData.forEach(row => {
+                        const newCustomer = {
+                            id: customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1,
+                            name: row.Name || row.name,
+                            email: row.Email || row.email,
+                            phone: row.Phone || row.phone
+                        };
+                        customers.push(newCustomer);
+                    });
+                    renderCustomerTable();
+                    alert(`Imported ${jsonData.length} customers successfully.`);
+                };
+                reader.readAsArrayBuffer(file);
+            };
+            input.click();
+        }
+
+        function exportCustomers() {
+            const worksheet = XLSX.utils.json_to_sheet(customers);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Customers");
+            XLSX.writeFile(workbook, "FreightBooks_Customers.xlsx");
+        }
+
+        function searchCustomers() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const filteredCustomers = customers.filter(customer => 
+                customer.name.toLowerCase().includes(searchTerm) ||
+                customer.email.toLowerCase().includes(searchTerm) ||
+                customer.phone.includes(searchTerm)
+            );
+            renderFilteredCustomers(filteredCustomers);
+        }
+
+        function renderFilteredCustomers(filteredCustomers) {
+            const customerList = document.getElementById('customer-list');
+            customerList.innerHTML = '';
+            filteredCustomers.forEach(customer => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${customer.id}</td>
+                    <td>${customer.name}</td>
+                    <td>${customer.email}</td>
+                    <td>${customer.phone}</td>
+                    <td>
+                        <button class="edit-customer" data-id="${customer.id}">Edit</button>
+                        <button class="delete-customer" data-id="${customer.id}">Delete</button>
+                    </td>
+                `;
+                customerList.appendChild(row);
+            });
+        }
+
+        function openExcelView() {
+            const container = document.getElementById('excel-container');
+            const data = customers.map(c => [c.id, c.name, c.email, c.phone]);
+            
+            hot = new Handsontable(container, {
+                data: data,
+                rowHeaders: true,
+                colHeaders: ['ID', 'Name', 'Email', 'Phone'],
+                columns: [
+                    { data: 0, type: 'numeric' },
+                    { data: 1 },
+                    { data: 2 },
+                    { data: 3 }
+                ],
+                minSpareRows: 1,
+                width: '100%',
+                height: 'auto',
+                licenseKey: 'non-commercial-and-evaluation'
+            });
+
+            showModal('excel-modal');
+        }
+
+        function saveExcelData() {
+            const newData = hot.getData();
+            customers = newData.filter(row => row[0]).map(row => ({
+                id: row[0],
+                name: row[1],
+                email: row[2],
+                phone: row[3]
+            }));
+            renderCustomerTable();
+            closeModal();
+        }
+    </script>
+</body>
+</html>

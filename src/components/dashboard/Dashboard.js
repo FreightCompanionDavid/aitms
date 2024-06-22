@@ -267,5 +267,226 @@ const ErrorFallback = ({ error }) => (
         <button onClick={() => window.location.reload()}>Refresh Page</button>
     </div>
 );
+const Dashboard = () => {
+    // ... existing code ...
+
+    return (
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <div className="dashboard">
+                <h1>Executive Dashboard</h1>
+                {isDashboardLoading ? (
+                    <div>Loading dashboard data...</div>
+                ) : dashboardError ? (
+                    <div>Error loading dashboard: {dashboardError.message}</div>
+                ) : (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <div className="dashboard-summary">
+                            {displaySummaryCards(dashboardData.summary)}
+                        </div>
+                        <div className="recent-shipments">
+                            <h2>Recent Shipments</h2>
+                            {displayRecentShipments(dashboardData.recentShipments)}
+                        </div>
+                        <div className="performance-metrics">
+                            <h2>Performance Metrics</h2>
+                            {displayPerformanceMetrics(dashboardData.performanceMetrics)}
+                        </div>
+                    </motion.div>
+                )}
+                <div className="dashboard-actions">
+                    <h2>Strategic Actions</h2>
+                    <button onClick={() => console.log('View detailed financial reports')}>View Detailed Financial Reports</button>
+                    <button onClick={() => console.log('Schedule board meeting')}>Schedule Board Meeting</button>
+                    <button onClick={() => console.log('Review expansion opportunities')}>Review Expansion Opportunities</button>
+                    <button onClick={toggleAIAssistant}>
+                        {showAIAssistant ? 'Hide AI Assistant' : 'Show AI Assistant'}
+                    </button>
+                </div>
+                <AnimatePresence>
+                    {showAIAssistant && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 20 }}
+                        >
+                            <Suspense fallback={<div>Loading AI Assistant...</div>}>
+                                <AIAssistant
+                                    onSendMessage={handleAIMessage}
+                                    aiMessage={aiMessage}
+                                />
+                            </Suspense>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </ErrorBoundary>
+    );
+};
+
+const StatCard = React.memo(({ title, value }) => (
+    <motion.div 
+        className="stat-card"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+    >
+        <h3>{title}</h3>
+        <p>{value}</p>
+    </motion.div>
+));
+
+const ErrorFallback = ({ error }) => (
+    <div className="error-fallback">
+        <h2>Oops! Something went wrong.</h2>
+        <p>Error: {error.message}</p>
+        <button onClick={() => window.location.reload()}>Refresh Page</button>
+    </div>
+);
 
 export default Dashboard;
+// Initialize GSAP ScrollTrigger
+useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Animate sections
+    gsap.utils.toArray('.animated-section').forEach(section => {
+        gsap.from(section, {
+            opacity: 0,
+            y: 50,
+            duration: 1,
+            scrollTrigger: {
+                trigger: section,
+                start: "top 80%",
+                end: "bottom 20%",
+                toggleActions: "play none none reverse"
+            }
+        });
+    });
+}, []);
+
+// Initialize tooltips
+useEffect(() => {
+    tippy('[data-tippy-content]', {
+        arrow: true,
+        delay: [50, 0],
+        theme: 'light-border',
+    });
+}, []);
+
+const displaySummaryCards = useCallback((summary) => {
+    return Object.entries(summary).map(([key, value]) => (
+        <StatCard key={key} title={key} value={value} />
+    ));
+}, []);
+
+const displayRecentShipments = useCallback((shipments) => {
+    return shipments.map(shipment => (
+        <motion.div key={shipment.id} className="shipment-card" whileHover={{ scale: 1.05 }}>
+            <h4>{shipment.id}</h4>
+            <p>Status: {shipment.status}</p>
+            <p>Destination: {shipment.destination}</p>
+        </motion.div>
+    ));
+}, []);
+
+const displayPerformanceMetrics = useCallback((metrics) => {
+    return (
+        <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={metrics}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="value" fill="#8884d8" />
+            </BarChart>
+        </ResponsiveContainer>
+    );
+}, []);
+
+const displayAIInsights = useCallback((insights) => {
+    return insights.map(insight => (
+        <motion.div key={insight.title} className="ai-insight" whileHover={{ scale: 1.05 }}>
+            <h4>{insight.title}</h4>
+            <p>{insight.description}</p>
+        </motion.div>
+    ));
+}, []);
+
+const displayFinancialOverview = useCallback((financialData) => {
+    return (
+        <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={financialData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="value" stroke="#8884d8" />
+            </LineChart>
+        </ResponsiveContainer>
+    );
+}, []);
+
+const displayComplianceStatus = useCallback((complianceStatus) => {
+    return (
+        <div className={`compliance-status ${complianceStatus.overall ? 'compliant' : 'non-compliant'}`}>
+            <h3>Overall Status: {complianceStatus.overall ? 'Compliant' : 'Non-Compliant'}</h3>
+            <ul>
+                {Object.entries(complianceStatus.details).map(([key, value]) => (
+                    <li key={key}>
+                        <span>{key}:</span>
+                        <span className={value ? 'compliant' : 'non-compliant'}>
+                            {value ? 'Compliant' : 'Non-Compliant'}
+                        </span>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+}, []);
+
+if (isDashboardLoading) return <div>Loading dashboard data...</div>;
+if (dashboardError) return <div>Error loading dashboard data: {dashboardError.message}</div>;
+
+return (
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <div className="dashboard">
+            <section id="dashboard-summary" className="animated-section">
+                <h2>Dashboard Summary</h2>
+                <div className="summary-cards">
+                    {displaySummaryCards(dashboardData.summary)}
+                </div>
+            </section>
+            
+            <section id="recent-shipments" className="animated-section">
+                <h2>Recent Shipments</h2>
+                <div className="shipment-list">
+                    {displayRecentShipments(dashboardData.recentShipments)}
+                </div>
+            </section>
+            
+            <section id="performance-metrics" className="animated-section">
+                <h2>Performance Metrics</h2>
+                {displayPerformanceMetrics(dashboardData.performanceMetrics)}
+            </section>
+            
+            <section id="ai-insights" className="animated-section">
+                <h2>AI Insights</h2>
+                <div className="ai-recommendations">
+                    {displayAIInsights(dashboardData.aiInsights)}
+                </div>
+            </section>
+
+            <section id="financial-overview" className="animated-section">
+                <h2>Financial Overview</h2>
+                {displayFinancialOverview(dashboardData.financialData)}
+            </section>
+
+            <section id="compliance-status" className="animated-section">
+                <h2>Compliance Status</h2>
+                {displayComplianceStatus(dashboardData.complianceStatus)}
+            </section>

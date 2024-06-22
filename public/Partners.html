@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreightBooks Companion - Partner Management</title>
+    <link rel="stylesheet" href="/dist/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.1/tippy.umd.min.js" defer></script>
+</head>
+<body>
+    <div id="app-container">
+        <header id="smart-header">
+            <nav>
+                <ul>
+                    <li><a href="index.html" data-tippy-content="Home Dashboard">Dashboard</a></li>
+                    <li><a href="Shipments.html" data-tippy-content="Manage Your Shipments">Shipments</a></li>
+                    <li><a href="Reports.html" data-tippy-content="View Detailed Reports">Reports</a></li>
+                    <li><a href="Partners.html" data-tippy-content="Manage Your Partners">Partners</a></li>
+                    <li><a href="Intergrations.html" data-tippy-content="Manage Integrations">Integrations</a></li>
+                    <li><a href="Email.html" data-tippy-content="Email Management">Email</a></li>
+                    <li><a href="Settings.html" data-tippy-content="Adjust Your Settings">Settings</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <main>
+            <section id="partner-management">
+                <h2>Partner Management</h2>
+                <div id="partner-actions">
+                    <button id="add-partner">Add New Partner</button>
+                    <button id="import-partners">Import Partners</button>
+                    <button id="export-partners">Export Partners</button>
+                    <button id="bulk-edit">Bulk Edit</button>
+                    <button id="generate-report">Generate Report</button>
+                </div>
+                <div id="partner-search">
+                    <input type="text" id="search-input" placeholder="Search partners...">
+                    <button id="search-button">Search</button>
+                    <select id="filter-type">
+                        <option value="all">All Types</option>
+                        <option value="carrier">Carrier</option>
+                        <option value="agent">Agent</option>
+                        <option value="supplier">Supplier</option>
+                    </select>
+                    <select id="filter-status">
+                        <option value="all">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="pending">Pending</option>
+                    </select>
+                </div>
+                <div id="partner-list-container">
+                    <table id="partner-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Contact</th>
+                                <th>Status</th>
+                                <th>Rating</th>
+                                <th>Last Interaction</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="partner-list">
+                            <!-- Partner rows will be dynamically added here -->
+                        </tbody>
+                    </table>
+                    <div id="pagination">
+                        <button id="prev-page">Previous</button>
+                        <span id="page-info">Page 1 of 1</span>
+                        <button id="next-page">Next</button>
+                    </div>
+                </div>
+            </section>
+            
+            <div id="partner-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2 id="modal-title">Add/Edit Partner</h2>
+                    <form id="partner-form">
+                        <input type="hidden" id="partner-id">
+                        <label for="partner-name">Name:</label>
+                        <input type="text" id="partner-name" required>
+                        <label for="partner-type">Type:</label>
+                        <select id="partner-type" required>
+                            <option value="carrier">Carrier</option>
+                            <option value="agent">Agent</option>
+                            <option value="supplier">Supplier</option>
+                        </select>
+                        <label for="partner-contact">Contact:</label>
+                        <input type="text" id="partner-contact" required>
+                        <label for="partner-email">Email:</label>
+                        <input type="email" id="partner-email" required>
+                        <label for="partner-phone">Phone:</label>
+                        <input type="tel" id="partner-phone">
+                        <label for="partner-address">Address:</label>
+                        <textarea id="partner-address"></textarea>
+                        <label for="partner-status">Status:</label>
+                        <select id="partner-status" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                        <label for="partner-rating">Rating:</label>
+                        <input type="number" id="partner-rating" min="1" max="5">
+                        <label for="partner-notes">Notes:</label>
+                        <textarea id="partner-notes"></textarea>
+                        <button type="submit">Save Partner</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="bulk-edit-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Bulk Edit Partners</h2>
+                    <form id="bulk-edit-form">
+                        <label for="bulk-status">Status:</label>
+                        <select id="bulk-status">
+                            <option value="">No change</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                        <label for="bulk-type">Type:</label>
+                        <select id="bulk-type">
+                            <option value="">No change</option>
+                            <option value="carrier">Carrier</option>
+                            <option value="agent">Agent</option>
+                            <option value="supplier">Supplier</option>
+                        </select>
+                        <button type="submit">Apply Changes</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="import-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Import Partners</h2>
+                    <form id="import-form">
+                        <input type="file" id="import-file" accept=".csv,.xlsx">
+                        <button type="submit">Import</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="report-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Partner Report</h2>
+                    <div id="report-content"></div>
+                    <div id="report-chart"></div>
+                </div>
+            </div>
+
+            <div id="map-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Partner Locations</h2>
+                    <div id="partner-map" style="height: 400px;"></div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2023 FreightBooks Companion. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        let partners = [];
+        let currentPage = 1;
+        const partnersPerPage = 10;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPartners();
+            setupEventListeners();
+            initializeMap();
+        });
+
+        async function loadPartners() {
+            try {
+                const response = await axios.get('/api/partners');
+                partners = response.data;
+                renderPartnerTable();
+            } catch (error) {
+                console.error('Error loading partners:', error);
+                notifyUser('Failed to load partners. Please try again.', 'error');
+            }
+        }
+
+        function renderPartnerTable() {
+            const partnerList = document.getElementById('partner-list');
+            partnerList.innerHTML = '';
+            const startIndex = (currentPage - 1) * partnersPerPage;
+            const endIndex = startIndex + partnersPerPage;
+            const pagePartners = partners.slice(startIndex, endIndex);
+
+            pagePartners.forEach(partner => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${partner.id}</td>
+                    <td>${partner.name}</td>
+                    <td>${partner.type}</td>
+                    <td>${partner.contact}</td>
+                    <td>${partner.status}</td>
+                    <td>${partner.rating || 'N/A'}</td>
+                    <td>${partner.lastInteraction || 'N/A'}</td>
+                    <td>
+                        <button class="edit-partner" data-id="${partner.id}">Edit</button>
+                        <button class="delete-partner" data-id="${partner.id}">Delete</button>
+                        <button class="view-location" data-id="${partner.id}">View Location</button>
+                    </td>
+                `;
+                partnerList.appendChild(row);
+            });
+
+            updatePagination();
+        }
+
+        function updatePagination() {
+            const pageInfo = document.getElementById('page-info');
+            const totalPages = Math.ceil(partners.length / partnersPerPage);
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+
+            document.getElementById('prev-page').disabled = currentPage === 1;
+            document.getElementById('next-page').disabled = currentPage === totalPages;
+        }
+
+        function setupEventListeners() {
+            document.getElementById('add-partner').addEventListener('click', showAddPartnerModal);
+            document.getElementById('import-partners').addEventListener('click', showImportModal);
+            document.getElementById('export-partners').addEventListener('click', exportPartners);
+            document.getElementById('bulk-edit').addEventListener('click', showBulkEditModal);
+            document.getElementById('generate-report').addEventListener('click', generateReport);
+            document.getElementById('search-button').addEventListener('click', searchPartners);
+            document.getElementById('filter-type').addEventListener('change', filterPartners);
+            document.getElementById('filter-status').addEventListener('change', filterPartners);
+            document.getElementById('partner-form').addEventListener('submit', savePartner);
+            document.getElementById('bulk-edit-form').addEventListener('submit', applyBulkEdit);
+            document.getElementById('import-form').addEventListener('submit', importPartners);
+            document.querySelectorAll('.close').forEach(el => el.addEventListener('click', closeModal));
+            document.getElementById('partner-list').addEventListener('click', handlePartnerActions);
+            document.getElementById('prev-page').addEventListener('click', () => changePage(-1));
+            document.getElementById('next-page').addEventListener('click', () => changePage(1));
+        }
+
+        function showAddPartnerModal() {
+            document.getElementById('modal-title').textContent = 'Add New Partner';
+            document.getElementById('partner-id').value = '';
+            document.getElementById('partner-form').reset();
+            showModal('partner-modal');
+        }
+
+        function showEditPartnerModal(partnerId) {
+            const partner = partners.find(p => p.id === parseInt(partnerId));
+            if (partner) {
+                document.getElementById('modal-title').textContent = 'Edit Partner';
+                document.getElementById('partner-id').value = partner.id;
+                document.getElementById('partner-name').value = partner.name;
+                document.getElementById('partner-type').value = partner.type;
+                document.getElementById('partner-contact').value = partner.contact;
+                document.getElementById('partner-email').value = partner.email;
+                document.getElementById('partner-phone').value = partner.phone;
+                document.getElementById('partner-address').value = partner.address;
+                document.getElementById('partner-status').value = partner.status;
+                document.getElementById('partner-rating').value = partner.rating || '';
+                document.getElementById('partner-notes').value = partner.notes || '';
+                showModal('partner-modal');
+            }
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => modal.style.display = 'none');
+        }
+
+        async function savePartner(event) {
+            event.preventDefault();
+            const partnerId = document.getElementById('partner-id').value;
+            const partner = {
+                id: partnerId ? parseInt(partnerId) : null,
+                name: document.getElementById('partner-name').value,
+                type: document.getElementById('partner-type').value,
+                contact: document.getElementById('partner-contact').value,
+                email: document.getElementById('partner-email').value,
+                phone: document.getElementById('partner-phone').value,
+                address: document.getElementById('partner-address').value,
+                status: document.getElementById('partner-status').value,
+                rating: document.getElementById('partner-rating').value,
+                notes: document.getElementById('partner-notes').value
+            };
+
+            try {
+                if (partnerId) {
+                    await axios.put(`/api/partners/${partnerId}`, partner);
+                } else {
+                    await axios.post('/api/partners', partner);
+                }
+                await loadPartners();
+                closeModal();
+                notifyUser('Partner saved successfully', 'success');
+            } catch (error) {
+                console.error('Error saving partner:', error);
+                notifyUser('Failed to save partner. Please try again.', 'error');
+            }
+        }
+
+        function handlePartnerActions(event) {
+            if (event.target.classList.contains('edit-partner')) {
+                showEditPartnerModal(event.target.dataset.id);
+            } else if (event.target.classList.contains('delete-partner')) {
+                deletePartner(event.target.dataset.id);
+            } else if (event.target.classList.contains('view-location')) {
+                showPartnerLocation(event.target.dataset.id);
+            }
+        }
+
+        async function deletePartner(partnerId) {
+            if (confirm('Are you sure you want to delete this partner?')) {
+                try {
+                    await axios.delete(`/api/partners/${partnerId}`);
+                    await loadPartners();
+                    notifyUser('Partner deleted successfully', 'success');
+                } catch (error) {
+                    console.error('Error deleting partner:', error);
+                    notifyUser('Failed to delete partner. Please try again.', 'error');
+                }
+            }
+        }
+
+        function showImportModal() {
+            showModal('import-modal');
+        }
+
+        async function importPartners(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById('import-file');
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                await axios.post('/api/partners/import', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                await loadPartners();
+                closeModal();
+        function exportPartners() {
+            // Implement partner export functionality
+            alert('Export partners functionality to be implemented');
+        }
+
+        function searchPartners() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const filteredPartners = partners.filter(partner => 
+                partner.name.toLowerCase().includes(searchTerm) ||
+                partner.type.toLowerCase().includes(searchTerm) ||
+                partner.contact.toLowerCase().includes(searchTerm) ||
+                partner.status.toLowerCase().includes(searchTerm)
+            );
+            renderFilteredPartners(filteredPartners);
+        }
+
+        function renderFilteredPartners(filteredPartners) {
+            const partnerList = document.getElementById('partner-list');
+            partnerList.innerHTML = '';
+            filteredPartners.forEach(partner => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${partner.id}</td>
+                    <td>${partner.name}</td>
+                    <td>${partner.type}</td>
+                    <td>${partner.contact}</td>
+                    <td>${partner.status}</td>
+                    <td>
+                        <button class="edit-partner" data-id="${partner.id}">Edit</button>
+                        <button class="delete-partner" data-id="${partner.id}">Delete</button>
+                    </td>
+                `;
+                partnerList.appendChild(row);
+            });
+        }
+
+        // Add GSAP animations
+        gsap.from("#partner-management", { duration: 1, opacity: 0, y: 50 });
+        gsap.from("#partner-actions button", { duration: 0.5, opacity: 0, x: -20, stagger: 0.1 });
+        gsap.from("#partner-table", { duration: 1, opacity: 0, y: 20, delay: 0.5 });
+    </script>
+</body>
+</html>

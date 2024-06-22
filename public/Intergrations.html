@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CargoWise One - Integrations</title>
+    <link rel="stylesheet" href="/dist/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.1/tippy.umd.min.js" defer></script>
+</head>
+<body>
+    <div id="app-container">
+        <header id="smart-header">
+            <nav>
+                <ul>
+                    <li><a href="index.html" data-tippy-content="Home Dashboard">Dashboard</a></li>
+                    <li><a href="shipments.html" data-tippy-content="Manage Your Shipments">Shipments</a></li>
+                    <li><a href="reports.html" data-tippy-content="View Detailed Reports">Reports</a></li>
+                    <li><a href="partners.html" data-tippy-content="Manage Your Partners">Partners</a></li>
+                    <li><a href="intergrations.html" data-tippy-content="Manage Integrations">Integrations</a></li>
+                    <li><a href="email.html" data-tippy-content="Email Management">Email</a></li>
+                    <li><a href="settings.html" data-tippy-content="Adjust Your Settings">Settings</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <main>
+            <AIPipeline>
+                <FormContainer>
+                    <section id="available-integrations">
+                        <h2>Available Integrations</h2>
+                        <div class="integration-grid">
+                            <div class="integration-card">
+                                <h3>QuickBooks Online</h3>
+                                <p>Sync financial data with QuickBooks Online</p>
+                                <button class="integrate-btn" data-integration="quickbooks">Integrate</button>
+                            </div>
+                            <div class="integration-card">
+                                <h3>FedEx API</h3>
+                                <p>Connect with FedEx for real-time shipping rates and tracking</p>
+                                <button class="integrate-btn" data-integration="fedex">Integrate</button>
+                            </div>
+                            <div class="integration-card">
+                                <h3>UPS API</h3>
+                                <p>Integrate UPS services for shipping and tracking</p>
+                                <button class="integrate-btn" data-integration="ups">Integrate</button>
+                            </div>
+                            <div class="integration-card">
+                                <h3>DHL API</h3>
+                                <p>Connect with DHL for international shipping services</p>
+                                <button class="integrate-btn" data-integration="dhl">Integrate</button>
+                            </div>
+                            <div class="integration-card">
+                                <h3>Salesforce CRM</h3>
+                                <p>Sync customer data with Salesforce CRM</p>
+                                <button class="integrate-btn" data-integration="salesforce">Integrate</button>
+                            </div>
+                            <div class="integration-card">
+                                <h3>Shopify</h3>
+                                <p>Connect your Shopify store for e-commerce integration</p>
+                                <button class="integrate-btn" data-integration="shopify">Integrate</button>
+                            </div>
+                            <div class="integration-card">
+                                <h3>Google Ads</h3>
+                                <p>Integrate with Google Ads for marketing campaigns</p>
+                                <button class="integrate-btn" data-integration="googleads">Integrate</button>
+                            </div>
+                            <div class="integration-card">
+                                <h3>Facebook Ads</h3>
+                                <p>Connect with Facebook Ads for social media marketing</p>
+                                <button class="integrate-btn" data-integration="facebookads">Integrate</button>
+                            </div>
+                            <div class="integration-card">
+                                <h3>Weather API</h3>
+                                <p>Integrate weather data for logistics planning</p>
+                                <button class="integrate-btn" data-integration="weather">Integrate</button>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <section id="active-integrations">
+                        <h2>Active Integrations</h2>
+                        <table id="active-integrations-table">
+                            <thead>
+                                <tr>
+                                    <th>Integration</th>
+                                    <th>Status</th>
+                                    <th>Last Sync</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Active integrations will be populated here dynamically -->
+                            </tbody>
+                        </table>
+                    </section>
+                </FormContainer>
+            </AIPipeline>
+        </main>
+        
+        <footer>
+            <p>&copy; 2023 CargoWise One. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script>
+        // ... (rest of the JavaScript code remains unchanged)
+    </script>
+    <style>
+        // ... (styles remain unchanged)
+    </style>
+</body>
+</html>

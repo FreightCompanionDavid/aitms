@@ -10,18 +10,64 @@
     <link rel="preload" href="dist/app.js" as="script">
     <link rel="stylesheet" href="dist/styles.css">
     <link rel="manifest" href="manifest.json">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.example.com;">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.1/tippy.css">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.example.com;">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/2.1.0/fingerprint2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/3.18.0/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.1/tippy.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/OutlinePass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/FXAAShader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+    <style>
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #000;
+            color: white;
+            padding: 8px;
+            z-index: 100;
+        }
+        .skip-link:focus {
+            top: 0;
+        }
+    </style>
 </head>
 <body>
-    <div id="loader" aria-label="Loading animation">
+    <div id="loader" class="animated-loader" aria-label="Loading animation">
         <div class="spinner"></div>
         <div class="text">Loading FreightBooks Companion...</div>
     </div>
 
     <div id="app-container">
-        <!-- App content will be dynamically inserted here -->
+        <a href="#main-content" class="skip-link">Skip to main content</a>
         <nav id="main-nav" aria-label="Main navigation">
-            <!-- Navigation menu items will be dynamically generated -->
+            <ul>
+                <li><a href="#" onclick="loadDashboard()" data-tippy-content="View your freight management dashboard">Dashboard</a></li>
+                <li class="dropdown">
+                    <a href="#" data-tippy-content="Access freight management tools">Tools</a>
+                    <ul class="dropdown-content">
+                        <li><a href="#" onclick="loadAPITester()">API Tester</a></li>
+                        <li><a href="#" onclick="loadTeamPlanner()">Team Planner</a></li>
+                        <li><a href="#" onclick="loadMonitoring()">Monitoring</a></li>
+                        <li><a href="#" onclick="loadCustomsClearance()">Customs Clearance</a></li>
+                        <li><a href="#" onclick="loadRouteOptimization()">Route Optimization</a></li>
+                        <li><a href="#" onclick="loadDangerousGoodsManagement()">Dangerous Goods</a></li>
+                    </ul>
+                </li>
+                <li><a href="#" onclick="loadSettings()">Settings</a></li>
+                <li><a href="#" onclick="loadHelp()">Help</a></li>
+            </ul>
         </nav>
 
         <div id="content-wrapper">
@@ -30,8 +76,10 @@
             </aside>
 
             <main id="app">
-                <div id="dashboard" class="dashboard-container">
-                    <!-- Dashboard content will be dynamically generated -->
+                <div id="main-content" tabindex="-1">
+                    <div id="dashboard" class="dashboard-container">
+                        <!-- Dashboard content will be dynamically generated -->
+                    </div>
                 </div>
             </main>
 
@@ -63,18 +111,612 @@
             <!-- Modal content will be dynamically generated -->
         </div>
 
-        <footer role="contentinfo">
-            <!-- Footer content will be dynamically generated -->
-        </footer>
+        <div id="3d-world-container" aria-label="3D world visualization">
+            <!-- 3D world content will be rendered here -->
+        </div>
     </div>
 
-    <noscript>
-        <p>JavaScript is required to use the full functionality of FreightBooks Companion.</p>
-        <p>Please enable JavaScript to access all features.</p>
-    </noscript>
+    <footer>
+        <p>&copy; 2024 FreightBooks Companion. All rights reserved.</p>
+    </footer>
 
-    <script src="dist/vendor.js" defer></script>
-    <script src="dist/app.js" defer></script>
+    <script src="dist/vendor.js"></script>
+    <script src="dist/app.js"></script>
+    <script src="components/APICombiner.js"></script>
+    <script>
+        // Initialize tooltips
+        tippy('[data-tippy-content]');
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+        });
+
+        function initApp() {
+            // Hide loader and show app container
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+
+            // Initialize components
+            initDashboard();
+            initAIChat();
+            init3DWorld();
+            initNotifications();
+
+            // Set initial system status
+            updateSystemStatus('Ready');
+
+            // Add event listeners for navigation
+            document.getElementById('nav-dashboard').addEventListener('click', loadDashboard);
+            document.getElementById('nav-api-tester').addEventListener('click', loadAPITester);
+            document.getElementById('nav-team-planner').addEventListener('click', loadTeamPlanner);
+            document.getElementById('nav-monitoring').addEventListener('click', loadMonitoring);
+
+            // Initialize the efficiency meter
+            updateEfficiencyMeter(50); // Start at 50% as a default
+
+            // Set up periodic system checks
+            setInterval(checkSystemStatus, 60000); // Check every minute
+
+            // Load user preferences
+            loadUserPreferences();
+
+            // Add offline support
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+
+            // Global error handling
+            window.onerror = function(message, source, lineno, colno, error) {
+                console.error('An error occurred:', error);
+                logErrorToServer(message, source, lineno, colno, error);
+                notifyUser('An unexpected error occurred. Our team has been notified.', 'error');
+                return true;
+            };
+        }
+
+        function loadUserPreferences() {
+            fetch('/api/user-preferences')
+                .then(response => response.json())
+                .then(preferences => {
+                    applyUserPreferences(preferences);
+                    initializeDashboardLayout(preferences.dashboardLayout);
+                })
+                .catch(error => console.error('Error loading user preferences:', error));
+        }
+
+        function applyUserPreferences(preferences) {
+            if (preferences.theme) {
+                document.body.classList.add(`theme-${preferences.theme}`);
+            }
+            if (preferences.fontSize) {
+                document.body.style.fontSize = preferences.fontSize;
+            }
+            // Apply other preferences as needed
+        }
+
+        function initializeDashboardLayout(layout) {
+            // Implement logic to arrange dashboard components based on user's saved layout
+            const dashboardContainer = document.getElementById('dashboard-widgets');
+            dashboardContainer.innerHTML = ''; // Clear existing layout
+
+            layout.forEach(widget => {
+                const widgetElement = document.createElement('div');
+                widgetElement.className = 'widget';
+                widgetElement.id = widget.id;
+                widgetElement.style.gridArea = `${widget.row} / ${widget.column} / span ${widget.rowSpan} / span ${widget.columnSpan}`;
+                
+                // Create widget content based on type
+                switch(widget.type) {
+                    case 'shipmentSummary':
+                        widgetElement.innerHTML = createShipmentSummaryWidget();
+                        break;
+                    case 'revenueChart':
+                        widgetElement.innerHTML = createRevenueChartWidget();
+                        break;
+                    case 'taskList':
+                        widgetElement.innerHTML = createTaskListWidget();
+                        break;
+                    // Add more widget types as needed
+                }
+
+                dashboardContainer.appendChild(widgetElement);
+            });
+
+            // Initialize widget functionality
+            initializeWidgets();
+        }
+
+        function createShipmentSummaryWidget() {
+            return `
+                <h2>Shipment Summary</h2>
+                <p>Total Shipments: <span id="total-shipments">Loading...</span></p>
+                <p>In Transit: <span id="in-transit">Loading...</span></p>
+                <p>Delivered: <span id="delivered">Loading...</span></p>
+            `;
+        }
+
+        function createRevenueChartWidget() {
+            return `
+                <h2>Revenue Chart</h2>
+                <canvas id="revenue-canvas"></canvas>
+            `;
+        }
+
+        function createTaskListWidget() {
+            return `
+                <h2>Pending Tasks</h2>
+                <ul id="task-list">Loading...</ul>
+            `;
+        }
+
+        function initializeWidgets() {
+            fetchShipmentSummary();
+            renderRevenueChart();
+            loadPendingTasks();
+        }
+
+        function saveUserPreferences(preferences) {
+            fetch('/api/user-preferences', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(preferences)
+            }).then(() => notifyUser('Preferences saved successfully', 'success'))
+              .catch(error => {
+                  console.error('Error saving preferences:', error);
+                  notifyUser('Failed to save preferences', 'error');
+              });
+        }
+
+        function updateOnlineStatus(event) {
+            const condition = navigator.onLine ? "online" : "offline";
+            console.log(`Connection status changed to ${condition}`);
+            if (condition === "offline") {
+                notifyUser("You are currently offline. Some features may be limited.", "warning");
+            } else {
+                notifyUser("You are back online!", "success");
+            }
+        }
+
+        function logErrorToServer(message, source, lineno, colno, error) {
+            fetch('/api/log-error', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message, source, lineno, colno, stack: error.stack })
+            }).catch(console.error);
+        }
+
+        function loadDashboard() {
+            const appDiv = document.getElementById('main-content');
+            appDiv.innerHTML = `
+                <h1>Dashboard</h1>
+                <div id="dashboard-widgets">
+                    <div class="widget" id="shipment-summary">
+                        <h2>Shipment Summary</h2>
+                        <p>Total Shipments: <span id="total-shipments">Loading...</span></p>
+                        <p>In Transit: <span id="in-transit">Loading...</span></p>
+                        <p>Delivered: <span id="delivered">Loading...</span></p>
+                    </div>
+                    <div class="widget" id="revenue-chart">
+                        <h2>Revenue Chart</h2>
+                        <canvas id="revenue-canvas"></canvas>
+                    </div>
+                </div>
+            `;
+            fetchDashboardData();
+            renderRevenueChart();
+        }
+
+        function loadAPITester() {
+            const appDiv = document.getElementById('main-content');
+            appDiv.innerHTML = `
+                <h1>API Tester</h1>
+                <form id="api-test-form">
+                    <select id="api-endpoint">
+                        <option value="">Select an API endpoint</option>
+                        <option value="shipments">Shipments API</option>
+                        <option value="tracking">Tracking API</option>
+                        <option value="customs">Customs API</option>
+                    </select>
+                    <input type="text" id="api-params" placeholder="Enter API parameters">
+                    <button type="submit">Test API</button>
+                </form>
+                <div id="api-response"></div>
+            `;
+            document.getElementById('api-test-form').addEventListener('submit', handleAPITest);
+        }
+
+        function loadTeamPlanner() {
+            const appDiv = document.getElementById('main-content');
+            appDiv.innerHTML = `
+                <h1>Team Planner</h1>
+                <div id="team-calendar"></div>
+                <form id="add-task-form">
+                    <input type="text" id="task-name" placeholder="Task name" required>
+                    <input type="date" id="task-date" required>
+                    <select id="task-assignee" required>
+                        <option value="">Assign to team member</option>
+                    </select>
+                    <button type="submit">Add Task</button>
+                </form>
+            `;
+            initializeTeamCalendar();
+            loadTeamMembers();
+            document.getElementById('add-task-form').addEventListener('submit', handleAddTask);
+        }
+
+        function loadMonitoring() {
+            const appDiv = document.getElementById('main-content');
+            appDiv.innerHTML = `
+                <h1>System Monitoring</h1>
+                <div id="monitoring-dashboard">
+                    <div class="monitor-widget" id="server-status">
+                        <h2>Server Status</h2>
+                        <p>Status: <span id="server-status-value">Checking...</span></p>
+                    </div>
+                    <div class="monitor-widget" id="api-performance">
+                        <h2>API Performance</h2>
+                        <canvas id="api-performance-chart"></canvas>
+                    </div>
+                    <div class="monitor-widget" id="error-log">
+                        <h2>Error Log</h2>
+                        <ul id="error-list"></ul>
+                    </div>
+                </div>
+            `;
+            initializeMonitoring();
+        }
+        function loadCustomsClearance() {
+            const appDiv = document.getElementById('app');
+            appDiv.innerHTML = `
+                <h1>Customs Clearance Management</h1>
+                <p>Manage customs clearance processes for your shipments.</p>
+                <form id="customs-form">
+                    <h2>Customs Declaration</h2>
+                    <label for="shipment-id">Shipment ID:</label>
+                    <input type="text" id="shipment-id" required>
+                    <label for="goods-description">Goods Description:</label>
+                    <textarea id="goods-description" required></textarea>
+                    <label for="value">Declared Value:</label>
+                    <input type="number" id="value" required>
+                    <label for="origin-country">Country of Origin:</label>
+                    <select id="origin-country" required>
+                        <option value="">Select a country</option>
+                        <option value="US">United States</option>
+                        <option value="CN">China</option>
+                        <option value="JP">Japan</option>
+                        <!-- Add more countries as needed -->
+                    </select>
+                    <button type="submit">Submit Customs Declaration</button>
+                </form>
+            `;
+            document.getElementById('customs-form').addEventListener('submit', handleCustomsSubmission);
+            updateContextSidebars('customs');
+            initTooltips();
+        }
+
+        function loadRouteOptimization() {
+            const appDiv = document.getElementById('app');
+            appDiv.innerHTML = `
+                <h1>Route Optimization</h1>
+                <p>Optimize your shipping routes for maximum efficiency.</p>
+                <form id="route-optimization-form">
+                    <h2>Route Parameters</h2>
+                    <label for="start-point">Start Point:</label>
+                    <input type="text" id="start-point" required>
+                    <label for="end-point">End Point:</label>
+                    <input type="text" id="end-point" required>
+                    <label for="stops">Intermediate Stops:</label>
+                    <textarea id="stops" placeholder="Enter one stop per line"></textarea>
+                    <label for="optimization-priority">Optimization Priority:</label>
+                    <select id="optimization-priority">
+                        <option value="time">Time</option>
+                        <option value="fuel">Fuel Efficiency</option>
+                        <option value="cost">Cost</option>
+                    </select>
+                    <button type="submit">Optimize Route</button>
+                </form>
+            `;
+            document.getElementById('route-optimization-form').addEventListener('submit', handleRouteOptimization);
+            updateContextSidebars('route');
+            initTooltips();
+        }
+
+        function loadDangerousGoodsManagement() {
+            const appDiv = document.getElementById('app');
+            appDiv.innerHTML = `
+                <h1>Dangerous Goods Management</h1>
+                <p>Manage and track dangerous goods shipments.</p>
+                <!-- Add interface for dangerous goods management here -->
+            `;
+            updateContextSidebars('dangerous-goods');
+            initTooltips();
+        }
+
+        function loadSettings() {
+            const appDiv = document.getElementById('app');
+            appDiv.innerHTML = `
+                <h1>Settings</h1>
+                <form id="settings-form">
+                    <h2>General Settings</h2>
+                    <label for="theme">Theme:</label>
+                    <select id="theme">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                    <label for="language">Language:</label>
+                    <select id="language">
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                    </select>
+                    <h2>Notification Settings</h2>
+                    <label>
+                        <input type="checkbox" id="email-notifications">
+                        Receive email notifications
+                    </label>
+                    <label>
+                        <input type="checkbox" id="push-notifications">
+                        Receive push notifications
+                    </label>
+                    <button type="submit">Save Settings</button>
+                </form>
+            `;
+            document.getElementById('settings-form').addEventListener('submit', handleSettingsSubmission);
+            updateContextSidebars('settings');
+            initTooltips();
+        }
+
+        function loadHelp() {
+            const appDiv = document.getElementById('app');
+            appDiv.innerHTML = `
+                <h1>Help Center</h1>
+                <div id="help-content">
+                    <h2>Frequently Asked Questions</h2>
+                    <ul id="faq-list">
+                        <li>
+                            <h3>How do I create a new shipment?</h3>
+                            <p>To create a new shipment, navigate to the Dashboard and click on the "New Shipment" button. Fill in the required details and submit the form.</p>
+                        </li>
+                        <li>
+                            <h3>How can I track my shipment?</h3>
+                            <p>You can track your shipment by entering the tracking number in the search bar on the Dashboard or by clicking on the shipment in your active shipments list.</p>
+                        </li>
+                        <li>
+                            <h3>How do I contact customer support?</h3>
+                            <p>For customer support, please email support@freightbooks.com or call our 24/7 hotline at 1-800-FREIGHT.</p>
+                        </li>
+                    </ul>
+                    <h2>Video Tutorials</h2>
+                    <div id="video-tutorials">
+                        <iframe src="https://www.youtube.com/embed/example1" frameborder="0" allowfullscreen></iframe>
+                        <iframe src="https://www.youtube.com/embed/example2" frameborder="0" allowfullscreen></iframe>
+                        <iframe src="https://www.youtube.com/embed/example3" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <h2>Need More Help?</h2>
+                    <p>If you can't find the answer to your question, please <a href="#" id="contact-support">contact our support team</a>.</p>
+                </div>
+            `;
+            document.getElementById('contact-support').addEventListener('click', openSupportChat);
+            document.getElementById('faq-list').addEventListener('click', toggleFAQAnswer);
+            loadAdditionalHelpResources();
+            updateContextSidebars('help');
+            initTooltips();
+        }
+
+        function toggleFAQAnswer(event) {
+            if (event.target.tagName === 'H3') {
+                const answer = event.target.nextElementSibling;
+                answer.style.display = answer.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        function loadAdditionalHelpResources() {
+            fetch('/api/help-resources')
+                .then(response => response.json())
+                .then(data => {
+                    const helpContent = document.getElementById('help-content');
+                    const additionalResources = document.createElement('div');
+                    additionalResources.innerHTML = `
+                        <h2>Additional Resources</h2>
+                        <ul>
+                            ${data.resources.map(resource => `
+                                <li><a href="${resource.url}" target="_blank">${resource.title}</a></li>
+                            `).join('')}
+                        </ul>
+                    `;
+                    helpContent.appendChild(additionalResources);
+                })
+                .catch(error => console.error('Error loading additional help resources:', error));
+        }
+        function updateSystemStatus(status) {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = status;
+            statusElement.className = ''; // Reset classes
+            
+            // Add appropriate class based on status
+            if (status.toLowerCase().includes('error')) {
+                statusElement.classList.add('status-error');
+            } else if (status.toLowerCase().includes('warning')) {
+                statusElement.classList.add('status-warning');
+            } else {
+                statusElement.classList.add('status-normal');
+            }
+
+            // Trigger notification for important status changes
+            if (status.toLowerCase().includes('error') || status.toLowerCase().includes('warning')) {
+                notifyUser(status);
+            }
+
+            // Log status change
+            logStatusChange(status);
+
+            // Update status history
+            updateStatusHistory(status);
+
+            // Update UI elements affected by status change
+            updateUIBasedOnStatus(status);
+        }
+
+        function logStatusChange(status) {
+            const timestamp = new Date().toISOString();
+            console.log(`[${timestamp}] System status changed: ${status}`);
+            // Send status change to server for logging
+            fetch('/api/log-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ timestamp, status })
+            }).catch(error => console.error('Error logging status change:', error));
+        }
+
+        function updateStatusHistory(status) {
+            const statusHistory = JSON.parse(localStorage.getItem('statusHistory') || '[]');
+            statusHistory.push({ timestamp: new Date().toISOString(), status: status });
+            // Keep only the last 10 status changes
+            if (statusHistory.length > 10) {
+                statusHistory.shift();
+            }
+            localStorage.setItem('statusHistory', JSON.stringify(statusHistory));
+            // Update status history display
+            updateStatusHistoryDisplay();
+        async function loadUserPreferences() {
+            try {
+                const response = await fetch('/api/user-preferences');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch user preferences');
+                }
+                const preferences = await response.json();
+                applyUserPreferences(preferences);
+                initializeDashboardLayout(preferences.dashboardLayout);
+            } catch (error) {
+                console.error('Error loading user preferences:', error);
+                notifyUser('Failed to load user preferences', 'error');
+            }
+        }
+
+        function applyUserPreferences(preferences) {
+            if (preferences.theme) {
+                document.body.className = ''; // Reset all themes
+                document.body.classList.add(`theme-${preferences.theme}`);
+            }
+            if (preferences.fontSize) {
+                document.documentElement.style.setProperty('--base-font-size', preferences.fontSize);
+            }
+            if (preferences.colorScheme) {
+                document.documentElement.setAttribute('data-color-scheme', preferences.colorScheme);
+            }
+            if (preferences.language) {
+                document.documentElement.lang = preferences.language;
+                loadLanguageResources(preferences.language);
+            }
+            // Apply other preferences as needed
+        }
+
+        function initializeDashboardLayout(layout) {
+            if (!layout) return;
+            
+            const dashboard = document.getElementById('dashboard');
+            dashboard.innerHTML = ''; // Clear existing layout
+            
+            layout.forEach(item => {
+                const widget = createWidget(item.type, item.data);
+                const gridItem = document.createElement('div');
+                gridItem.className = 'dashboard-item';
+                gridItem.style.gridArea = item.position;
+                gridItem.appendChild(widget);
+                dashboard.appendChild(gridItem);
+            });
+        }
+
+        async function saveUserPreferences(preferences) {
+            try {
+                const response = await fetch('/api/user-preferences', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(preferences)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to save preferences');
+                }
+                
+                notifyUser('Preferences saved successfully', 'success');
+                applyUserPreferences(preferences); // Apply changes immediately
+            } catch (error) {
+                console.error('Error saving preferences:', error);
+                notifyUser('Failed to save preferences', 'error');
+            }
+        }
+
+        function createWidget(type, data) {
+            // Implement widget creation based on type and data
+            const widget = document.createElement('div');
+            widget.className = `widget ${type}`;
+            // Populate widget with data
+            return widget;
+        }
+        async function loadLanguageResources(language) {
+            try {
+                // Fetch language resources from the server
+                const response = await fetch(`/api/language-resources/${language}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch language resources');
+                }
+                const resources = await response.json();
+
+                // Update UI elements with the fetched language resources
+                Object.keys(resources).forEach(key => {
+                    const elements = document.querySelectorAll(`[data-lang-key="${key}"]`);
+                    elements.forEach(element => {
+                        if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                            element.placeholder = resources[key];
+                        } else {
+                            element.textContent = resources[key];
+                        }
+                    });
+                });
+
+                // Update document language
+                document.documentElement.lang = language;
+
+                // Store the current language in local storage
+                localStorage.setItem('userLanguage', language);
+
+                console.log(`Language resources loaded successfully for ${language}`);
+            } catch (error) {
+                console.error('Error loading language resources:', error);
+                notifyUser('Failed to load language resources. Using default language.', 'error');
+            }
+        }
+        function initNotifications() {
+            // Initialize notification system
+            if ('Notification' in window) {
+                Notification.requestPermission().then(function (permission) {
+                    if (permission === "granted") {
+                        console.log("Notification permission granted.");
+                    }
+                });
+            }
+        }
+
+        function initTooltips() {
+            tippy('[data-tippy-content]', {
+                arrow: true,
+                delay: [50, 0],
+                theme: 'light-border',
+            });
+        }
+
+        function initializeApp() {
+            initDashboard();
+            initAIChat();
+            init3DWorld();
+            initNotifications();
+            initTooltips();
+            loadRecentActivity();
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
 
     <script>
         if ('serviceWorker' in navigator) {
@@ -88,6 +730,17 @@
                     });
             });
         }
+    </script>
+</body>
+</html>
+        }
+    </script>
+</body>
+</html>
+
+
+</html>
+
     </script>
 </body>
 </html>

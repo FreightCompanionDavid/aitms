@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreightBooks Companion - AI-Powered Email Management</title>
+    <link rel="stylesheet" href="/dist/styles.css">
+    <link rel="stylesheet" href="/src/styles/main.css">
+    <link rel="stylesheet" href="/src/styles/email.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/qna"></script>
+    <script src="https://cdn.jsdelivr.net/npm/openai"></script>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://alcdn.msauth.net/browser/2.1.0/js/msal-browser.min.js"></script>
+</head>
+<body>
+    <div id="app-container">
+        <header>
+            <h1>FreightBooks Companion AI-Powered Email Management</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#" class="active">Email</a></li>
+                    <li><a href="#ai-assistant">AI Assistant</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <main>
+            <section id="email-management">
+                <h2>Email Management</h2>
+                <div id="email-actions">
+                    <button id="compose-email">Compose Email</button>
+                    <button id="refresh-inbox">Refresh Inbox</button>
+                    <button id="view-spam">View Spam</button>
+                    <button id="ai-categorize">AI Categorize</button>
+                    <button id="connect-gmail">Connect Gmail</button>
+                    <button id="connect-outlook">Connect Outlook</button>
+                </div>
+                <div id="email-search">
+                    <input type="text" id="search-input" placeholder="Search emails...">
+                    <button id="search-button">Search</button>
+                    <button id="ai-search">AI-Powered Search</button>
+                </div>
+                <div id="email-list">
+                    <!-- Email list will be dynamically populated here -->
+                </div>
+            </section>
+            
+            <section id="email-view" style="display: none;">
+                <h3 id="email-subject"></h3>
+                <p id="email-sender"></p>
+                <p id="email-date"></p>
+                <div id="email-body"></div>
+                <div id="email-attachments"></div>
+                <button id="reply-email">Reply</button>
+                <button id="forward-email">Forward</button>
+                <button id="delete-email">Delete</button>
+                <button id="ai-summarize">AI Summarize</button>
+                <button id="ai-sentiment">AI Sentiment Analysis</button>
+            </section>
+            
+            <section id="compose-email-form" style="display: none;">
+                <h3>Compose Email</h3>
+                <form id="email-form">
+                    <input type="text" id="recipient" placeholder="To" required>
+                    <input type="text" id="subject" placeholder="Subject" required>
+                    <textarea id="message" placeholder="Message" required></textarea>
+                    <input type="file" id="attachment" multiple>
+                    <button type="submit">Send</button>
+                    <button type="button" id="cancel-compose">Cancel</button>
+                    <button type="button" id="ai-compose">AI Compose</button>
+                    <button type="button" id="ai-improve">AI Improve</button>
+                </form>
+            </section>
+
+            <section id="ai-assistant" style="display: none;">
+                <h3>AI Email Assistant</h3>
+                <div id="ai-chat">
+                    <!-- AI chat messages will be displayed here -->
+                </div>
+                <input type="text" id="ai-input" placeholder="Ask me anything about your emails...">
+                <button id="ai-send">Send</button>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        let emails = [];
+        let spamFilter;
+        let qnaModel;
+        let openai;
+        let gmailAuth;
+        let outlookAuth;
+
+        // SMTP configuration
+        const smtpConfig = {
+            host: 'smtp.example.com',
+            username: 'your_username',
+            password: 'your_password',
+            port: 587,
+            secure: false // Use TLS
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeEmailManagement();
+            initializeAIModels();
+            fetchEmails();
+        });
+
+        async function initializeAIModels() {
+            const threshold = 0.9;
+            spamFilter = await toxicity.load(threshold);
+            qnaModel = await qna.load();
+            openai = new OpenAI({ apiKey: 'your-openai-api-key' });
+        }
+
+        function initializeEmailManagement() {
+            document.getElementById('compose-email').addEventListener('click', showComposeForm);
+            document.getElementById('refresh-inbox').addEventListener('click', refreshInbox);
+            document.getElementById('view-spam').addEventListener('click', viewSpam);
+            document.getElementById('search-button').addEventListener('click', searchEmails);
+            document.getElementById('ai-search').addEventListener('click', aiSearchEmails);
+            document.getElementById('email-form').addEventListener('submit', sendEmail);
+            document.getElementById('cancel-compose').addEventListener('click', hideComposeForm);
+            document.getElementById('email-list').addEventListener('click', handleEmailClick);
+            document.getElementById('reply-email').addEventListener('click', replyToEmail);
+            document.getElementById('forward-email').addEventListener('click', forwardEmail);
+            document.getElementById('delete-email').addEventListener('click', deleteEmail);
+            document.getElementById('ai-categorize').addEventListener('click', aiCategorizeEmails);
+            document.getElementById('ai-summarize').addEventListener('click', aiSummarizeEmail);
+            document.getElementById('ai-sentiment').addEventListener('click', aiSentimentAnalysis);
+            document.getElementById('ai-compose').addEventListener('click', aiComposeEmail);
+            document.getElementById('ai-improve').addEventListener('click', aiImproveEmail);
+            document.getElementById('ai-send').addEventListener('click', handleAIAssistant);
+            document.getElementById('connect-gmail').addEventListener('click', connectGmail);
+            document.getElementById('connect-outlook').addEventListener('click', connectOutlook);
+        }
+
+        async function fetchEmails() {
+            try {
+                const response = await fetch('/api/emails');
+                emails = await response.json();
+                renderEmailList(emails);
+            } catch (error) {
+                console.error('Error fetching emails:', error);
+            }
+        }
+
+        function renderEmailList(emailsToRender) {
+            const emailList = document.getElementById('email-list');
+            emailList.innerHTML = '';
+            emailsToRender.forEach(email => {
+                const emailElement = document.createElement('div');
+                emailElement.classList.add('email-item');
+                emailElement.innerHTML = `
+                    <h4>${email.subject}</h4>
+                    <p>${email.sender}</p>
+                    <p>${new Date(email.date).toLocaleString()}</p>
+                `;
+                emailElement.addEventListener('click', () => displayEmail(email));
+                emailList.appendChild(emailElement);
+            });
+        }
+
+        function displayEmail(email) {
+            const emailView = document.getElementById('email-view');
+            emailView.style.display = 'block';
+            document.getElementById('email-subject').textContent = email.subject;
+            document.getElementById('email-sender').textContent = `From: ${email.sender}`;
+            document.getElementById('email-date').textContent = `Date: ${new Date(email.date).toLocaleString()}`;
+            document.getElementById('email-body').innerHTML = email.body;
+            // Display attachments if any
+            const attachmentsContainer = document.getElementById('email-attachments');
+            attachmentsContainer.innerHTML = '';
+            if (email.attachments && email.attachments.length > 0) {
+                email.attachments.forEach(attachment => {
+                    const attachmentElement = document.createElement('a');
+                    attachmentElement.href = attachment.url;
+                    attachmentElement.textContent = attachment.filename;
+                    attachmentElement.download = attachment.filename;
+                    attachmentsContainer.appendChild(attachmentElement);
+                });
+            }
+        }
+
+        async function sendEmail(event) {
+            event.preventDefault();
+            const recipient = document.getElementById('recipient').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+            const attachmentInput = document.getElementById('attachment');
+            const attachments = attachmentInput.files;
+
+            try {
+                if (gmailAuth) {
+                    await sendGmailEmail(recipient, subject, message, attachments);
+                } else if (outlookAuth) {
+                    await sendOutlookEmail(recipient, subject, message, attachments);
+                } else {
+                    await Email.send({
+                        Host: smtpConfig.host,
+                        Username: smtpConfig.username,
+                        Password: smtpConfig.password,
+                        To: recipient,
+                        From: smtpConfig.username,
+                        Subject: subject,
+                        Body: message,
+                        Attachments: Array.from(attachments).map(file => ({
+                            name: file.name,
+                            data: file
+                        }))
+                    });
+                }
+                alert('Email sent successfully!');
+                hideComposeForm();
+                refreshInbox();
+            } catch (error) {
+                console.error('Error sending email:', error);
+                alert('Failed to send email. Please try again.');
+            }
+        }
+
+        function showComposeForm() {
+            document.getElementById('compose-email-form').style.display = 'block';
+        }
+
+        function hideComposeForm() {
+            document.getElementById('compose-email-form').style.display = 'none';
+            document.getElementById('email-form').reset();
+        }
+
+        function refreshInbox() {
+            fetchEmails();
+        }
+
+        async function viewSpam() {
+            try {
+                const response = await fetch('/api/spam-emails');
+                const spamEmails = await response.json();
+                renderEmailList(spamEmails);
+            } catch (error) {
+                console.error('Error fetching spam emails:', error);
+            }
+        }
+
+        function searchEmails() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const filteredEmails = emails.filter(email => 
+                email.subject.toLowerCase().includes(searchTerm) ||
+                email.body.toLowerCase().includes(searchTerm) ||
+                email.sender.toLowerCase().includes(searchTerm)
+            );
+            renderEmailList(filteredEmails);
+        }
+
+        async function aiSearchEmails() {
+            const searchTerm = document.getElementById('search-input').value;
+            const aiSearchResult = await openai.complete({
+                engine: 'davinci',
+                prompt: `Search for emails related to: ${searchTerm}`,
+                max_tokens: 100
+            });
+            const relevantEmails = emails.filter(email => 
+                aiSearchResult.choices[0].text.toLowerCase().includes(email.subject.toLowerCase()) ||
+                aiSearchResult.choices[0].text.toLowerCase().includes(email.body.toLowerCase())
+            );
+            renderEmailList(relevantEmails);
+        }
+
+        async function aiCategorizeEmails() {
+            const categories = await openai.complete({
+                engine: 'davinci',
+                prompt: 'Categorize the following emails:',
+                max_tokens: 100
+            });
+            // Implement logic to categorize emails based on AI response
+            console.log('AI Categorization:', categories.choices[0].text);
+        }
+
+        async function aiSummarizeEmail() {
+            const currentEmail = getCurrentEmail();
+            const summary = await openai.complete({
+                engine: 'davinci',
+                prompt: `Summarize this email: ${currentEmail.body}`,
+                max_tokens: 100
+            });
+            alert('AI Summary: ' + summary.choices[0].text);
+        }
+
+        async function aiSentimentAnalysis() {
+            const currentEmail = getCurrentEmail();
+            const sentiment = await openai.complete({
+                engine: 'davinci',
+                prompt: `Analyze the sentiment of this email: ${currentEmail.body}`,
+                max_tokens: 50
+            });
+            alert('Sentiment Analysis: ' + sentiment.choices[0].text);
+        }
+
+        async function aiComposeEmail() {
+            const subject = document.getElementById('subject').value;
+            const aiComposed = await openai.complete({
+                engine: 'davinci',
+                prompt: `Write an email with the subject: ${subject}`,
+                max_tokens: 200
+            });
+            document.getElementById('message').value = aiComposed.choices[0].text;
+        }
+
+        async function aiImproveEmail() {
+            const currentMessage = document.getElementById('message').value;
+            const improvedMessage = await openai.complete({
+                engine: 'davinci',
+                prompt: `Improve this email: ${currentMessage}`,
+                max_tokens: 200
+            });
+            document.getElementById('message').value = improvedMessage.choices[0].text;
+        }
+
+        async function handleAIAssistant() {
+            const userInput = document.getElementById('ai-input').value;
+            const aiResponse = await openai.complete({
+                engine: 'davinci',
+                prompt: `User: ${userInput}\nAI:`,
+                max_tokens: 150
+            });
+            displayAIMessage(aiResponse.choices[0].text);
+        }
+
+        function displayAIMessage(message) {
+            const aiChat = document.getElementById('ai-chat');
+            const messageElement = document.createElement('p');
+            messageElement.textContent = message;
+            aiChat.appendChild(messageElement);
+        }
+
+        function getCurrentEmail() {
+            // Implement logic to get the currently displayed email
+            return emails[0]; // Placeholder
+        }
+
+        function replyToEmail() {
+            const currentEmail = getCurrentEmail();
+            showComposeForm();
+            document.getElementById('recipient').value = currentEmail.sender;
+            document.getElementById('subject').value = `Re: ${currentEmail.subject}`;
+            document.getElementById('message').value = `\n\nOn ${new Date(currentEmail.date).toLocaleString()}, ${currentEmail.sender} wrote:\n> ${currentEmail.body}`;
+        }
+
+        function forwardEmail() {
+            const currentEmail = getCurrentEmail();
+            showComposeForm();
+            document.getElementById('subject').value = `Fwd: ${currentEmail.subject}`;
+            document.getElementById('message').value = `\n\n---------- Forwarded message ---------\nFrom: ${currentEmail.sender}\nDate: ${new Date(currentEmail.date).toLocaleString()}\nSubject: ${currentEmail.subject}\n\n${currentEmail.body}`;
+        }
+
+        async function deleteEmail() {
+            const currentEmail = getCurrentEmail();
+            try {
+                await fetch(`/api/emails/${currentEmail.id}`, { method: 'DELETE' });
+                alert('Email deleted successfully');
+                refreshInbox();
+            } catch (error) {
+                console.error('Error deleting email:', error);
+                alert('Failed to delete email. Please try again.');
+            }
+        }
+
+        // Gmail Integration
+        function connectGmail() {
+            gapi.load('client:auth2', initGmailClient);
+        }
+
+        function initGmailClient() {
+            gapi.client.init({
+        // Implement animations using GSAP
+        gsap.from("#email-list", { duration: 1, opacity: 0, y: 50, stagger: 0.2 });
+        gsap.from("#email-actions button", { duration: 0.5, opacity: 0, x: -20, stagger: 0.1 });
+
+        // Add more AI-powered features and optimizations here
+    </script>
+</body>
+</html>

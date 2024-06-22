@@ -1,0 +1,60 @@
+<header id="smart-header">
+    <nav>
+        <ul>
+            <li><a href="index.html" data-tippy-content="Home Dashboard">Dashboard</a></li>
+            <li><a href="Shipments.html" data-tippy-content="Manage Your Shipments">Shipments</a></li>
+            <li><a href="Reports.html" data-tippy-content="View Detailed Reports">Reports</a></li>
+            <li><a href="Partners.html" data-tippy-content="Manage Your Partners">Partners</a></li>
+            <li><a href="Intergrations.html" data-tippy-content="Manage Integrations">Integrations</a></li>
+            <li><a href="Email.html" data-tippy-content="Email Management">Email</a></li>
+            <li><a href="Settings.html" data-tippy-content="Adjust Your Settings">Settings</a></li>
+        </ul>
+    </nav>
+</header>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPage = window.location.pathname.split('/').pop();
+    const links = document.querySelectorAll('#smart-header nav a');
+    links.forEach(link => {
+        if (link.getAttribute('href') === currentPage) {
+            link.classList.add('active');
+        }
+    });
+
+    // Initialize tooltips
+    tippy('[data-tippy-content]', {
+        arrow: true,
+        delay: [50, 0],
+        theme: 'light-border',
+    });
+
+    // Add keyboard shortcuts for navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey) {
+            switch(e.key) {
+                case 'd': window.location.href = 'index.html'; break;
+                case 's': window.location.href = 'Shipments.html'; break;
+                case 'r': window.location.href = 'Reports.html'; break;
+                case 'p': window.location.href = 'Partners.html'; break;
+                case 'i': window.location.href = 'Intergrations.html'; break;
+                case 'e': window.location.href = 'Email.html'; break;
+                case 't': window.location.href = 'Settings.html'; break;
+            }
+        }
+    });
+
+    // Add animation to the header
+    gsap.from('#smart-header', {duration: 1, y: -50, opacity: 0, ease: 'power3.out'});
+
+    // Add hover effect to nav items
+    links.forEach(link => {
+        link.addEventListener('mouseenter', () => {
+            gsap.to(link, {duration: 0.3, scale: 1.1, color: '#3498db'});
+        });
+        link.addEventListener('mouseleave', () => {
+            gsap.to(link, {duration: 0.3, scale: 1, color: '#ecf0f1'});
+        });
+    });
+});
+</script>

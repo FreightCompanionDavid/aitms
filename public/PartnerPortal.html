@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreightBooks Companion - Partner Portal</title>
+    <link rel="stylesheet" href="dist/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.1/tippy.umd.min.js" defer></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+            color: #f0f0f0;
+        }
+        .partner-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .partner-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        .partner-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .partner-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #2196F3;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #fff;
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+        }
+        .notification.success {
+            background-color: #4CAF50;
+        }
+        .notification.error {
+            background-color: #f44336;
+        }
+        .notification.info {
+            background-color: #2196F3;
+        }
+        .partner-tier {
+            font-weight: bold;
+            color: #FFD700;
+        }
+        .partner-points {
+            font-style: italic;
+            color: #90EE90;
+        }
+        .whitelabel-settings {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #ADD8E6;
+        }
+    </style>
+</head>
+<body>
+    <div class="partner-container">
+        <h1>FreightBooks Companion Partner Portal</h1>
+        <div id="partner-list">
+            <!-- Partner cards will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script>
+        // Sample partner data (in a real application, this would come from a backend API)
+        const partners = [
+            { id: 1, name: "Global Logistics Co.", status: "Active", lastSync: "2023-05-15", address: "123 Main St, New York, NY", contact: "John Doe (555-1234)", shipments: 150, rating: 4.8, points: 1500, tier: "Gold", whitelabel: { enabled: true, domain: "global-logistics.freightbooks.com" } },
+            { id: 2, name: "FastFreight Inc.", status: "Pending", lastSync: "2023-05-10", address: "456 Elm St, Los Angeles, CA", contact: "Jane Smith (555-5678)", shipments: 80, rating: 4.2, points: 800, tier: "Silver", whitelabel: { enabled: false, domain: null } },
+            { id: 3, name: "SeaWay Shipping", status: "Active", lastSync: "2023-05-12", address: "789 Oak St, Miami, FL", contact: "Bob Johnson (555-9012)", shipments: 200, rating: 4.5, points: 2000, tier: "Platinum", whitelabel: { enabled: true, domain: "seaway.freightbooks.com" } }
+        ];
+
+        function createPartnerCard(partner) {
+            return `
+                <div class="partner-card" data-tippy-content="Partner ID: ${partner.id}">
+                    <h2>${partner.name}</h2>
+                    <p>Status: ${partner.status}</p>
+                    <p class="last-sync">Last Sync: ${partner.lastSync}</p>
+                    <p>Shipments: ${partner.shipments}</p>
+                    <p>Rating: ${partner.rating}/5</p>
+                    <p class="partner-tier">Tier: ${partner.tier}</p>
+                    <p class="partner-points">Points: ${partner.points}</p>
+                    <div class="whitelabel-settings">
+                        Whitelabel: ${partner.whitelabel.enabled ? `Enabled (${partner.whitelabel.domain})` : 'Disabled'}
+                    </div>
+                    <div class="partner-actions">
+                        <button class="btn btn-primary" onclick="syncPartner(${partner.id})">Sync Now</button>
+                        <button class="btn btn-secondary" onclick="viewPartnerDetails(${partner.id})">View Details</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPartners() {
+            const partnerList = document.getElementById('partner-list');
+            partnerList.innerHTML = partners.map(createPartnerCard).join('');
+            
+            // Initialize tooltips
+            tippy('[data-tippy-content]', {
+                arrow: true,
+                delay: [50, 0],
+                theme: 'light-border',
+            });
+        }
+
+        async function syncPartner(partnerId) {
+            try {
+                const response = await fetch(`/api/partners/${partnerId}/sync`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                const result = await response.json();
+                console.log(`Syncing partner with ID: ${partnerId}`, result);
+                
+                // Update the partner's last sync date in the UI
+                const partnerCard = document.querySelector(`.partner-card[data-tippy-content="Partner ID: ${partnerId}"]`);
+                if (partnerCard) {
+                    const lastSyncElement = partnerCard.querySelector('.last-sync');
+                    if (lastSyncElement) {
+                        lastSyncElement.textContent = `Last Sync: ${new Date().toISOString().split('T')[0]}`;
+                    }
+                }
+                
+                notifyUser(`Sync completed for partner ID: ${partnerId}`, 'success');
+            } catch (error) {
+                console.error(`Error syncing partner with ID: ${partnerId}:`, error);
+                notifyUser(`Failed to sync partner ID: ${partnerId}. Please try again.`, 'error');
+            }
+        }
+
+        async function viewPartnerDetails(partnerId) {
+            try {
+                const response = await fetch(`/api/partners/${partnerId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                const partnerDetails = await response.json();
+                console.log(`Viewing details for partner with ID: ${partnerId}`, partnerDetails);
+                
+                // Create and show a modal with partner details
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <h2>${partnerDetails.name}</h2>
+                        <p>ID: ${partnerDetails.id}</p>
+                        <p>Status: ${partnerDetails.status}</p>
+                        <p>Last Sync: ${partnerDetails.lastSync}</p>
+                        <p>Address: ${partnerDetails.address}</p>
+                        <p>Contact: ${partnerDetails.contact}</p>
+                        <p>Shipments: ${partnerDetails.shipments}</p>
+                        <p>Rating: ${partnerDetails.rating}/5</p>
+                        <p class="partner-tier">Tier: ${partnerDetails.tier}</p>
+                        <p class="partner-points">Points: ${partnerDetails.points}</p>
+                        <div class="whitelabel-settings">
+                            Whitelabel: ${partnerDetails.whitelabel.enabled ? `Enabled (${partnerDetails.whitelabel.domain})` : 'Disabled'}
+                        </div>
+                        <button onclick="closeModal()">Close</button>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            } catch (error) {
+                console.error(`Error fetching details for partner with ID: ${partnerId}:`, error);
+                notifyUser(`Failed to load details for partner ID: ${partnerId}. Please try again.`, 'error');
+            }
+        }
+
+        function closeModal() {
+            const modal = document.querySelector('.modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function notifyUser(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPartners();
+
+            // Add some animation to the partner cards
+            gsap.from(".partner-card", {
+                duration: 0.5,
+                opacity: 0,
+                y: 50,
+                stagger: 0.2,
+                ease: "power2.out"
+            });
+        });
+    </script>
+</body>
+</html>

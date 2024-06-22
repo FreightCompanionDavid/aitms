@@ -70,3 +70,85 @@
     color: #999;
     font-size: 12px;
 }
+
+/* Add these styles to your existing styles.css file */
+
+.animated-section {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.summary-card {
+    background-color: #f0f4f8;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.shipment-card {
+    background-color: #f0f4f8;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.ai-insight {
+    background-color: #e6f7ff;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+#financial-charts, #compliance-summary {
+    min-height: 300px;
+}
+
+.compliance-status {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.compliance-status.compliant {
+    background-color: #e6ffed;
+    color: #52c41a;
+}
+
+.compliance-status.non-compliant {
+    background-color: #fff1f0;
+    color: #f5222d;
+}
+
+#compliance-summary ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#compliance-summary li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+#compliance-summary li:last-child {
+    border-bottom: none;
+}
+
+.compliant {
+    color: #52c41a;
+}
+
+.non-compliant {
+    color: #f5222d;
+}

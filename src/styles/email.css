@@ -1,0 +1,197 @@
+/* Email Management Styles */
+#email-management {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+#email-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+#email-actions button {
+  padding: 10px 15px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#email-actions button:hover {
+  background-color: #45a049;
+}
+
+#email-search {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+#search-input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
+}
+
+#search-button, #ai-search {
+  padding: 10px 15px;
+  background-color: #008CBA;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+
+#email-list {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.email-item {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.email-item:last-child {
+  border-bottom: none;
+}
+
+.email-item:hover {
+  background-color: #f5f5f5;
+}
+
+/* Email View Styles */
+#email-view {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+#email-subject {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+#email-sender, #email-date {
+  color: #666;
+  margin-bottom: 5px;
+}
+
+#email-body {
+  margin-top: 20px;
+  line-height: 1.6;
+}
+
+#email-attachments {
+  margin-top: 20px;
+}
+
+#email-attachments a {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #333;
+}
+
+/* Compose Email Form Styles */
+#compose-email-form {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+#email-form input[type="text"],
+#email-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+#email-form textarea {
+  height: 200px;
+}
+
+#email-form button {
+  padding: 10px 15px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+#email-form button[type="button"] {
+  background-color: #f44336;
+}
+
+/* AI Assistant Styles */
+#ai-assistant {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+#ai-chat {
+  height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+#ai-input {
+  width: calc(100% - 70px);
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
+}
+
+#ai-send {
+  width: 70px;
+  padding: 10px;
+  background-color: #008CBA;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  #email-actions {
+    flex-direction: column;
+  }
+  
+  #email-actions button {
+    margin-bottom: 10px;
+  }
+  
+  #email-search {
+    flex-direction: column;
+  }
+  
+  #search-input, #search-button, #ai-search {
+    width: 100%;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+}

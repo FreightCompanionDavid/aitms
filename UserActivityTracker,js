@@ -6,6 +6,8 @@ class UserActivityTracker {
         this.callback = null;
         this.socket = null;
         this.store = store;
+        this.activityBuffer = [];
+        this.bufferTimeout = null;
     }
 
     start(callback) {
@@ -13,29 +15,54 @@ class UserActivityTracker {
         const state = this.store.getState();
         const token = state.auth.token;
         this.socket = io('https://your-extreme-server.com', {
-            auth: {
-                token: token
+            auth: { token },
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000,
+        });
+        
+        this.setupSocketListeners();
+        this.setupTrackers();
+    }
+
+    setupSocketListeners() {
+        this.socket.on('connect', () => {
+            console.log('Socket connected successfully');
+            this.flushActivityBuffer();
+        });
+
+        this.socket.on('connect_error', (error) => {
+            console.error('Socket connection error:', error);
+            this.handleConnectionError();
+        });
+
+        this.socket.on('disconnect', (reason) => {
+            console.warn('Socket disconnected:', reason);
+            if (reason === 'io server disconnect') {
+                this.socket.connect();
             }
         });
+    }
+
+    setupTrackers() {
         this.trackNavigation();
         this.trackAPICalls();
-        this.trackCodeEdits();
         this.trackMouseMovements();
         this.trackKeyboardShortcuts();
         this.trackReduxActions();
         this.trackFormSubmissions();
-
-        this.socket.on('connect_error', (error) => {
-            console.error('Socket connection error:', error);
-            // Implement retry logic or notify user
-        });
+        this.trackCodeEdits();
     }
 
     stop() {
         if (this.socket) {
             this.socket.disconnect();
         }
-        // Remove event listeners
+        this.removeEventListeners();
+        clearTimeout(this.bufferTimeout);
+    }
+
+    removeEventListeners() {
         window.removeEventListener('popstate', this.navigationHandler);
         document.removeEventListener('mousemove', this.mouseMovementHandler);
         document.removeEventListener('keydown', this.keyboardShortcutHandler);
@@ -65,15 +92,11 @@ class UserActivityTracker {
         }
     }
 
-    trackCodeEdits() {
-        // This is now handled in the CodeEditor component
-    }
-
     trackMouseMovements() {
         let lastEmitTime = 0;
         this.mouseMovementHandler = (e) => {
             const now = Date.now();
-            if (now - lastEmitTime > 1000) { // Throttle to once per second
+            if (now - lastEmitTime > 1000) {
                 this.emitActivity({ type: 'mouse_move', x: e.clientX, y: e.clientY });
                 lastEmitTime = now;
             }
@@ -109,6 +132,11 @@ class UserActivityTracker {
         document.addEventListener('submit', this.formSubmissionHandler);
     }
 
+    trackCodeEdits() {
+        // Implement code edit tracking logic here
+        // This could involve integrating with a code editor component
+    }
+
     emitActivity(activity) {
         const state = this.store.getState();
         const enhancedActivity = {
@@ -117,8 +145,39 @@ class UserActivityTracker {
             userId: state.auth.user ? state.auth.user.id : null,
             extremeMode: state.auth.extremeMode
         };
-        this.callback(enhancedActivity);
-        this.socket.emit('user_activity', enhancedActivity);
+        
+        this.activityBuffer.push(enhancedActivity);
+        
+        if (this.socket && this.socket.connected) {
+            this.flushActivityBuffer();
+        } else {
+            this.scheduleBufferFlush();
+        }
+        
+        if (this.callback) {
+            this.callback(enhancedActivity);
+        }
+    }
+
+    flushActivityBuffer() {
+        if (this.activityBuffer.length > 0) {
+            this.socket.emit('user_activity_batch', this.activityBuffer);
+            this.activityBuffer = [];
+        }
+    }
+
+    scheduleBufferFlush() {
+        if (!this.bufferTimeout) {
+            this.bufferTimeout = setTimeout(() => {
+                this.flushActivityBuffer();
+                this.bufferTimeout = null;
+            }, 5000); // Flush every 5 seconds if disconnected
+        }
+    }
+
+    handleConnectionError() {
+        // Implement retry logic or notify user
+        console.log('Attempting to reconnect...');
     }
 }
 

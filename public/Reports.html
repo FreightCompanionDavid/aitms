@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreightBooks Companion - AI-Powered Reports</title>
+    <link rel="stylesheet" href="/dist/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Add OpenAI API -->
+    <script src="https://cdn.jsdelivr.net/npm/openai"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.1/tippy.umd.min.js" defer></script>
+</head>
+<body>
+    <div id="app-container">
+        <header id="smart-header">
+            <nav>
+                <ul>
+                    <li><a href="index.html" data-tippy-content="Home Dashboard">Dashboard</a></li>
+                    <li><a href="Shipments.html" data-tippy-content="Manage Your Shipments">Shipments</a></li>
+                    <li><a href="Reports.html" data-tippy-content="View Detailed Reports">Reports</a></li>
+                    <li><a href="Partners.html" data-tippy-content="Manage Your Partners">Partners</a></li>
+                    <li><a href="Intergrations.html" data-tippy-content="Manage Integrations">Integrations</a></li>
+                    <li><a href="Email.html" data-tippy-content="Email Management">Email</a></li>
+                    <li><a href="Settings.html" data-tippy-content="Adjust Your Settings">Settings</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <div class="breadcrumb">
+            <a href="index.html">Home</a> &gt; Reports
+        </div>
+        
+        <main>
+            <section id="report-generator" class="animated-section">
+                <h2>Generate AI-Enhanced Custom Report</h2>
+                <form id="report-form">
+                    <label for="report-type">Report Type:</label>
+                    <select id="report-type" required class="animated-input">
+                        <option value="">Select a report type</option>
+                        <option value="shipment-summary">Shipment Summary</option>
+                        <option value="financial-overview">Financial Overview</option>
+                        <option value="performance-metrics">Performance Metrics</option>
+                        <option value="predictive-analysis">Predictive Analysis</option>
+                        <option value="route-optimization">Route Optimization</option>
+                    </select>
+                    
+                    <label for="date-range">Date Range:</label>
+                    <input type="date" id="start-date" required class="animated-input">
+                    <input type="date" id="end-date" required class="animated-input">
+                    
+                    <label for="visualization-type">Visualization Type:</label>
+                    <select id="visualization-type" required class="animated-input">
+                        <option value="bar">Bar Chart</option>
+                        <option value="line">Line Chart</option>
+                        <option value="pie">Pie Chart</option>
+                        <option value="scatter">Scatter Plot</option>
+                        <option value="heatmap">Heatmap</option>
+                        <option value="3d">3D Visualization</option>
+                    </select>
+                    
+                    <button type="submit" id="generate-report" class="animated-button">Generate AI Report</button>
+                </form>
+            </section>
+            
+            <section id="report-display" style="display: none;" class="animated-section">
+                <h2 id="report-title"></h2>
+                <div id="report-content"></div>
+                <div id="visualization-container"></div>
+                <div id="ai-insights"></div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2023 FreightBooks Companion. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize GSAP ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Animate title
+        gsap.from(".animated-title", {
+            duration: 1.5,
+            opacity: 0,
+            y: -100,
+            rotationX: 180,
+            ease: "elastic.out(1, 0.5)"
+        });
+
+        // Animate nav links
+        gsap.from(".nav-link", {
+            duration: 1,
+            opacity: 0,
+            y: 50,
+            stagger: 0.2,
+            ease: "back.out(1.7)"
+        });
+
+        // Animate form inputs
+        gsap.from(".animated-input", {
+            duration: 0.8,
+            opacity: 0,
+            x: -100,
+            stagger: 0.1,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: "#report-generator",
+                start: "top 80%"
+            }
+        });
+
+        // Animate button
+        gsap.from(".animated-button", {
+            duration: 1,
+            scale: 0,
+            rotation: 720,
+            ease: "elastic.out(1, 0.3)",
+            scrollTrigger: {
+                trigger: "#report-generator",
+                start: "top 60%"
+            }
+        });
+
+        // Initialize OpenAI
+        const openai = new OpenAI('YOUR_API_KEY_HERE');
+
+        // Report generation logic
+        document.getElementById('report-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const reportType = document.getElementById('report-type').value;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const visualizationType = document.getElementById('visualization-type').value;
+            
+            try {
+                const reportData = await generateAIEnhancedData(reportType, startDate, endDate);
+                displayAIReport(reportType, reportData, visualizationType);
+            } catch (error) {
+                console.error('Error generating report:', error);
+                alert('An error occurred while generating the report. Please try again.');
+            }
+        });
+
+        async function generateAIEnhancedData(type, start, end) {
+            // Generate mock data based on report type
+            const mockData = {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: type.replace('-', ' ').toUpperCase(),
+                    data: Array.from({length: 6}, () => Math.floor(Math.random() * 1000)),
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            };
+
+            // Use OpenAI to generate insights
+            const prompt = `Based on the ${type} data from ${start} to ${end}, provide three key insights. The data values are: ${mockData.datasets[0].data.join(', ')}.`;
+            
+            const response = await openai.complete({
+                engine: 'text-davinci-002',
+                prompt: prompt,
+                maxTokens: 150,
+                n: 1,
+                stop: null,
+                temperature: 0.7,
+            });
+
+            mockData.aiInsights = response.choices[0].text.split('\n').filter(insight => insight.trim() !== '');
+
+            return mockData;
+        }
+
+        function displayAIReport(type, data, visualizationType) {
+            const reportDisplay = document.getElementById('report-display');
+            const reportTitle = document.getElementById('report-title');
+            const reportContent = document.getElementById('report-content');
+            const visualizationContainer = document.getElementById('visualization-container');
+            const aiInsights = document.getElementById('ai-insights');
+
+            reportTitle.textContent = type.replace('-', ' ').toUpperCase() + ' AI Report';
+            reportContent.innerHTML = '<p>AI-generated report with advanced insights. See visualization below.</p>';
+
+            // Clear previous visualizations
+            visualizationContainer.innerHTML = '';
+
+            // Create visualization based on selected type
+            switch(visualizationType) {
+                case 'bar':
+                case 'line':
+                case 'pie':
+                    createChartJsVisualization(visualizationType, data, visualizationContainer);
+                    break;
+                case 'scatter':
+                    createPlotlyScatterPlot(data, visualizationContainer);
+                    break;
+                case 'heatmap':
+                    createD3Heatmap(data, visualizationContainer);
+                    break;
+                case '3d':
+                    create3DVisualization(data, visualizationContainer);
+                    break;
+            }
+
+            // Display AI insights
+            aiInsights.innerHTML = '<h3>AI Insights:</h3><ul>' + 
+                data.aiInsights.map(insight => `<li>${insight}</li>`).join('') + 
+                '</ul>';
+
+            // Show report section with animation
+            gsap.to(reportDisplay, {
+                duration: 1,
+                opacity: 1,
+                display: 'block',
+                y: 0,
+                rotationY: 360,
+                ease: "power4.out"
+            });
+        }
+
+        function createChartJsVisualization(type, data, container) {
+            const canvas = document.createElement('canvas');
+            container.appendChild(canvas);
+            new Chart(canvas, {
+                type: type,
+                data: data,
+                options: {
+                    responsive: true,
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutBounce'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createPlotlyScatterPlot(data, container) {
+            const trace = {
+                x: data.labels,
+                y: data.datasets[0].data,
+                mode: 'markers',
+                type: 'scatter',
+                marker: { 
+                    size: 12,
+                    color: data.datasets[0].data,
+                    colorscale: 'Viridis',
+                    showscale: true
+                }
+            };
+            Plotly.newPlot(container, [trace], {
+                title: 'AI-Generated Scatter Plot',
+                autosize: true,
+                height: 500,
+                scene: {
+                    xaxis: {title: 'Month'},
+                    yaxis: {title: 'Value'},
+                    zaxis: {title: 'Category'}
+                }
+            });
+        }
+
+        function createD3Heatmap(data, container) {
+            const margin = {top: 30, right: 30, bottom: 30, left: 30},
+                width = 450 - margin.left - margin.right,
+                height = 450 - margin.top - margin.bottom;
+
+            const svg = d3.select(container)
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            const x = d3.scaleBand()
+                .range([0, width])
+                .domain(data.labels)
+                .padding(0.01);
+            svg.append("g")
+                .attr("transform", `translate(0, ${height})`)
+                .call(d3.axisBottom(x));
+
+            const y = d3.scaleBand()
+                .range([height, 0])
+                .domain(data.labels)
+                .padding(0.01);
+            svg.append("g")
+                .call(d3.axisLeft(y));
+
+            const colorScale = d3.scaleSequential()
+                .interpolator(d3.interpolateInferno)
+                .domain([0, d3.max(data.datasets[0].data)]);
+
+            svg.selectAll()
+                .data(data.datasets[0].data)
+                .enter()
+                .append("rect")
+                .attr("x", (d, i) => x(data.labels[i]))
+                .attr("y", (d, i) => y(data.labels[i]))
+                .attr("width", x.bandwidth())
+                .attr("height", y.bandwidth())
+                .style("fill", d => colorScale(d))
+                .attr("opacity", 0)
+                .transition()
+                .duration(1000)
+                .attr("opacity", 1);
+        }
+
+        function create3DVisualization(data, container) {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            const geometry = new THREE.BoxGeometry();
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const cube = new THREE.Mesh(geometry, material);
+            scene.add(cube);
+
+            camera.position.z = 5;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                cube.rotation.x += 0.01;
+                cube.rotation.y += 0.01;
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+    </script>
+</body>
+</html>

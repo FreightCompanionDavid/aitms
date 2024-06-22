@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreightBooks Companion - Shipments</title>
+    <meta name="description" content="Manage and track your shipments efficiently with FreightBooks Companion's advanced shipment management system.">
+    <link rel="preload" href="dist/styles.css" as="style">
+    <link rel="preload" href="dist/vendor.js" as="script">
+    <link rel="preload" href="dist/app.js" as="script">
+    <link rel="stylesheet" href="dist/styles.css">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.1/tippy.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.example.com;">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.1/tippy.umd.min.js" defer></script>
+    <style>
+        /* Include all the styles from indexEx.html here */
+        body {
+            background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+            color: #f0f0f0;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        #app-container {
+            display: grid;
+            grid-template-columns: 250px 1fr 250px;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100vh;
+            gap: 20px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        #main-nav {
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        #main-nav ul {
+            display: flex;
+            justify-content: space-around;
+            list-style-type: none;
+            padding: 0;
+            flex-wrap: wrap;
+        }
+
+        #main-nav li {
+            margin: 5px;
+        }
+
+        #main-nav a {
+            color: #f0f0f0;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+
+        #main-nav a:hover {
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            max-height: calc(100vh - 40px);
+        }
+
+        .sidebar:hover {
+            transform: scale(1.05);
+        }
+
+        #content-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        #content {
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+        }
+
+        /* Shipment-specific styles */
+        .shipment-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .shipment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .shipment-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .notification.success {
+            background-color: #4CAF50;
+        }
+
+        .notification.error {
+            background-color: #f44336;
+        }
+
+        .notification.info {
+            background-color: #2196F3;
+        }
+
+        .shipment-status {
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .shipment-eta {
+            font-style: italic;
+            color: #90EE90;
+        }
+    </style>
+</head>
+<body>
+    <header id="smart-header">
+        <nav>
+            <ul>
+                <li><a href="index.html" data-tippy-content="Home Dashboard">Dashboard</a></li>
+                <li><a href="Shipments.html" data-tippy-content="Manage Your Shipments">Shipments</a></li>
+                <li><a href="Reports.html" data-tippy-content="View Detailed Reports">Reports</a></li>
+                <li><a href="Partners.html" data-tippy-content="Manage Your Partners">Partners</a></li>
+                <li><a href="Intergrations.html" data-tippy-content="Manage Integrations">Integrations</a></li>
+                <li><a href="Email.html" data-tippy-content="Email Management">Email</a></li>
+                <li><a href="Settings.html" data-tippy-content="Adjust Your Settings">Settings</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="breadcrumb">
+        <a href="index.html">Home</a> &gt; Shipments
+    </div>
+
+    <div id="app-container">
+        <div class="sidebar">
+            <!-- Sidebar content goes here -->
+        </div>
+        <div id="content-wrapper">
+            <div id="content">
+                <h1>FreightBooks Companion - Shipments</h1>
+                <div id="shipment-list">
+                    <!-- Shipment cards will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+        <div class="sidebar">
+            <!-- Sidebar content goes here -->
+        </div>
+    </div>
+
+    <script>
+        // Sample shipment data (in a real application, this would come from a backend API)
+        const shipments = [
+            { id: 1, trackingNumber: "FBC1234567", status: "In Transit", origin: "New York, NY", destination: "Los Angeles, CA", eta: "2023-06-01", carrier: "FastFreight Inc.", weight: "500 lbs" },
+            { id: 2, trackingNumber: "FBC7654321", status: "Delivered", origin: "Chicago, IL", destination: "Miami, FL", eta: "2023-05-28", carrier: "Global Logistics Co.", weight: "750 lbs" },
+            { id: 3, trackingNumber: "FBC9876543", status: "Pending", origin: "Seattle, WA", destination: "Boston, MA", eta: "2023-06-05", carrier: "SeaWay Shipping", weight: "1000 lbs" }
+        ];
+
+        function createShipmentCard(shipment) {
+            return `
+                <div class="shipment-card" data-tippy-content="Shipment ID: ${shipment.id}">
+                    <h2>Tracking #: ${shipment.trackingNumber}</h2>
+                    <p class="shipment-status">Status: ${shipment.status}</p>
+                    <p>Origin: ${shipment.origin}</p>
+                    <p>Destination: ${shipment.destination}</p>
+                    <p class="shipment-eta">ETA: ${shipment.eta}</p>
+                    <p>Carrier: ${shipment.carrier}</p>
+                    <p>Weight: ${shipment.weight}</p>
+                    <div class="shipment-actions">
+                        <button class="btn btn-primary" onclick="updateShipment(${shipment.id})">Update Status</button>
+                        <button class="btn btn-secondary" onclick="viewShipmentDetails(${shipment.id})">View Details</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderShipments() {
+            const shipmentList = document.getElementById('shipment-list');
+            shipmentList.innerHTML = shipments.map(createShipmentCard).join('');
+            
+            // Initialize tooltips
+            tippy('[data-tippy-content]', {
+                arrow: true,
+                delay: [50, 0],
+                theme: 'light-border',
+            });
+        }
+
+        async function updateShipment(shipmentId) {
+            try {
+                const response = await fetch(`/api/shipments/${shipmentId}/update`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                const result = await response.json();
+                console.log(`Updating shipment with ID: ${shipmentId}`, result);
+                
+                // Update the shipment's status in the UI
+                const shipmentCard = document.querySelector(`.shipment-card[data-tippy-content="Shipment ID: ${shipmentId}"]`);
+                if (shipmentCard) {
+                    const statusElement = shipmentCard.querySelector('.shipment-status');
+                    if (statusElement) {
+                        statusElement.textContent = `Status: ${result.newStatus}`;
+                    }
+                }
+                
+                notifyUser(`Status updated for shipment ID: ${shipmentId}`, 'success');
+            } catch (error) {
+                console.error(`Error updating shipment with ID: ${shipmentId}:`, error);
+                notifyUser(`Failed to update shipment ID: ${shipmentId}. Please try again.`, 'error');
+            }
+        }
+
+        async function viewShipmentDetails(shipmentId) {
+            try {
+                const response = await fetch(`/api/shipments/${shipmentId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                const shipmentDetails = await response.json();
+                
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <h2>Shipment Details</h2>
+                        <p>Tracking #: ${shipmentDetails.trackingNumber}</p>
+                        <p>Status: ${shipmentDetails.status}</p>
+                        <p>Origin: ${shipmentDetails.origin}</p>
+                        <p>Destination: ${shipmentDetails.destination}</p>
+                        <p>ETA: ${shipmentDetails.eta}</p>
+                        <p>Carrier: ${shipmentDetails.carrier}</p>
+                        <p>Weight: ${shipmentDetails.weight}</p>
+                        <button onclick="closeModal()">Close</button>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            } catch (error) {
+                console.error(`Error fetching details for shipment with ID: ${shipmentId}:`, error);
+                notifyUser(`Failed to load details for shipment ID: ${shipmentId}. Please try again.`, 'error');
+            }
+        }
+
+        function closeModal() {
+            const modal = document.querySelector('.modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function notifyUser(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderShipments();
+
+            // Add some animation to the shipment cards
+            gsap.from(".shipment-card", {
+                duration: 0.5,
+                opacity: 0,
+                y: 50,
+                stagger: 0.2,
+                ease: "power2.out"
+            });
+        });
+    </script>
+</body>
+</html>

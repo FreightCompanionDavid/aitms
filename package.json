@@ -1,0 +1,64 @@
+{
+  "name": "freightbooks-companion",
+  "version": "1.0.0",
+  "description": "Advanced freight management system with AI assistance",
+  "main": "src/index.tsx",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint": "eslint src/**/*.{ts,tsx}",
+    "format": "prettier --write src/**/*.{ts,tsx,css,json}"
+  },
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-redux": "^7.2.4",
+    "redux": "^4.1.0",
+    "redux-thunk": "^2.3.0",
+    "styled-components": "^5.3.0",
+    "socket.io-client": "^4.1.2",
+    "lodash": "^4.17.21",
+    "three": "^0.130.1",
+    "chart.js": "^3.5.0",
+    "react-chartjs-2": "^3.0.4",
+    "tippy.js": "^6.3.1",
+    "gsap": "^3.9.1",
+    "@tensorflow/tfjs": "^3.18.0",
+    "@tensorflow-models/face-landmarks-detection": "^1.0.2",
+    "howler": "^2.2.3",
+    "fingerprintjs2": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.11",
+    "@types/react-dom": "^17.0.8",
+    "@types/react-redux": "^7.1.16",
+    "@types/styled-components": "^5.1.10",
+    "@types/lodash": "^4.14.170",
+    "@types/three": "^0.130.0",
+    "@typescript-eslint/eslint-plugin": "^4.28.1",
+    "@typescript-eslint/parser": "^4.28.1",
+    "eslint": "^7.29.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-react": "^7.24.0",
+    "prettier": "^2.3.2",
+    "typescript": "^4.3.5",
+    "react-scripts": "4.0.3",
+    "workbox-webpack-plugin": "^6.1.5"
+  },
+  "author": "FreightBooks Team",
+  "license": "MIT",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

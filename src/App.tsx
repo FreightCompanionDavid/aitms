@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './store';
 import Dashboard from './components/Dashboard';
@@ -25,19 +25,19 @@ const App: React.FC = () => {
           <div className="app">
             <Header />
             <main>
-              <Switch>
-                <Route exact path="/" component={Dashboard} />
-                <Route path="/chat" component={AIAssistantChat} />
-                <Route path="/ask" component={AskAI} />
-                <Route path="/visualize" component={FreightVisualizer} />
-                <Route path="/customs" component={CustomsDeclaration} />
-                <Route path="/track" component={TrackShipment} />
-                <Route path="/analytics" component={Analytics} />
-                <Route path="/dangerous-goods" component={DangerousGoods} />
-                <Route path="/quick-pass" component={QuickPass} />
-                <Route path="/profile" component={UserProfile} />
-                <Route path="/settings" component={Settings} />
-              </Switch>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/chat" element={<AIAssistantChat />} />
+                <Route path="/ask" element={<AskAI />} />
+                <Route path="/visualize" element={<FreightVisualizer />} />
+                <Route path="/customs" element={<CustomsDeclaration />} />
+                <Route path="/track" element={<TrackShipment />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/dangerous-goods" element={<DangerousGoods />} />
+                <Route path="/quick-pass" element={<QuickPass />} />
+                <Route path="/profile" element={<UserProfile />} />
+                <Route path="/settings" element={<Settings />} />
+              </Routes>
             </main>
             <Footer />
             <div id="app-container">

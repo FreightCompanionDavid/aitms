@@ -11,8 +11,8 @@ import { generateSuggestions, applySuggestion } from '../actions/aiActions';
 import debounce from 'lodash/debounce';
 import { UserActivityTracker } from '../utils/UserActivityTracker';
 import { APIDocManager } from '../utils/APIDocManager';
-import { Visualize } from './Visualize';
-import { FreightForms } from './components/FreightForms';
+import Visualize from './Visualize';
+import FreightForms from './components/FreightForms';
 import { CopilotAssistant } from '../utils/CopilotAssistant';
 import { ThreeDVisualizer } from './3DFreightVisualizer';
 import '../styles/LudicrousMode.css';
@@ -256,6 +256,7 @@ const AIAssistantChat: React.FC = () => {
       <FreightForms />
       <Visualize />
       <ThreeDVisualizer />
+      <CopilotAssistant />
     </div>
   );
 };
