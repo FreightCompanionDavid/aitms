@@ -1,0 +1,80 @@
+import OpenAI from 'openai';
+import axios from 'axios';
+
+class APIDocManager {
+    private openai: OpenAI;
+    private apiDocs: Record<string, any>;
+    private embeddings: Record<string, any>;
+
+    constructor() {
+        this.openai = new OpenAI({ apiKey: process.env.REACT_APP_OPENAI_API_KEY });
+        this.apiDocs = {};
+        this.embeddings = {};
+    }
+
+    async fetchAndEmbedDocs(apiUrl: string): Promise<void> {
+        if (this.apiDocs[apiUrl]) return;
+
+        try {
+            const response = await axios.get(apiUrl);
+            const apiSpec = response.data;
+
+            this.apiDocs[apiUrl] = apiSpec;
+
+            // Generate embeddings for each endpoint
+            for (const path in apiSpec.paths) {
+                for (const method in apiSpec.paths[path]) {
+                    const endpoint = apiSpec.paths[path][method];
+                    const text = `${method.toUpperCase()} ${path}\n${endpoint.summary}\n${endpoint.description}`;
+                    const embedding = await this.getEmbedding(text);
+                    this.embeddings[`${apiUrl}|${method}|${path}`] = {
+                        apiName: apiUrl,
+                        method: method,
+                        path: path,
+                        summary: endpoint.summary,
+                        parameters: endpoint.parameters,
+                        embedding: embedding
+                    };
+                }
+            }
+        } catch (error) {
+            console.error(`Error fetching API docs for ${apiUrl}:`, error);
+            throw new Error(`Failed to fetch and embed docs for ${apiUrl}`);
+        }
+    }
+
+    private async getEmbedding(text: string): Promise<number[]> {
+        try {
+            const response = await this.openai.embeddings.create({
+                model: "text-embedding-ada-002",
+                input: text,
+            });
+            return response.data[0].embedding;
+        } catch (error) {
+            console.error('Error getting embedding:', error);
+            throw new Error('Failed to get embedding');
+        }
+    }
+
+    async findRelevantEndpoints(query: string, topK: number = 5, selectedApis: string[] = []): Promise<string[]> {
+        const queryEmbedding = await this.getEmbedding(query);
+        const similarities = Object.entries(this.embeddings)
+            .filter(([key, { apiName }]) => selectedApis.length === 0 || selectedApis.includes(apiName))
+            .map(([key, { apiName, embedding }]) => ({
+                key,
+                apiName,
+                similarity: this.cosineSimilarity(queryEmbedding, embedding),
+            }));
+        similarities.sort((a, b) => b.similarity - a.similarity);
+        return similarities.slice(0, topK).map(item => item.key);
+    }
+
+    private cosineSimilarity(a: number[], b: number[]): number {
+        const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
+        const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
+        const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
+        return dotProduct / (magnitudeA * magnitudeB);
+    }
+}
+
+export default APIDocManager;

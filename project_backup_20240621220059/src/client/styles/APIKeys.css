@@ -1,0 +1,46 @@
+/* APIKeys.css */
+
+.api-keys {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 20px 0;
+}
+
+.api-keys h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.api-keys ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.api-keys li {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.api-keys li:last-child {
+    border-bottom: none;
+}
+
+.api-keys li strong {
+    font-size: 18px;
+    color: #007bff;
+    margin-right: 10px;
+}
+
+.api-keys .loading,
+.api-keys .error {
+    font-size: 16px;
+    color: #555;
+}

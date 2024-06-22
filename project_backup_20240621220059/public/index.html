@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreightBooks Companion - Advanced Freight Management</title>
+    <meta name="description" content="Experience efficient and advanced freight management with FreightBooks Companion!">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="components/Animations.css">
+    <link rel="stylesheet" href="components/3DFreightVisualizer.css">
+    <link rel="stylesheet" href="components/VoiceCommands.css">
+    <link rel="stylesheet" href="components/ARFreightTracker.css">
+    <link rel="stylesheet" href="components/FreightForms.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/2.1.0/fingerprint2.min.js"></script>
+    <script src="components/APICombiner.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/3.18.0/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.1/tippy.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.1/tippy.css">
+</head>
+<body>
+    <div id="loader" class="animated-loader">
+        <div class="spinner"></div>
+        <div class="text">Loading FreightBooks Companion...</div>
+    </div>
+    <div id="app-container">
+        <nav id="main-nav">
+            <ul>
+                <li><a href="#" onclick="loadDashboard()" data-tippy-content="View your freight management dashboard">Dashboard</a></li>
+                <li class="dropdown">
+                    <a href="#" data-tippy-content="Track and manage your freight">Freight Management ▼</a>
+                    <ul class="dropdown-content">
+                        <li><a href="#" onclick="loadFreightTracker()">Freight Tracker</a></li>
+                        <li><a href="#" onclick="loadRouteOptimization()">Route Optimization</a></li>
+                        <li><a href="#" onclick="loadDangerousGoodsManagement()">Dangerous Goods</a></li>
+                    </ul>
+                </li>
+                <li><a href="#" onclick="loadAnalytics()" data-tippy-content="Analyze your freight data">Analytics</a></li>
+                <li><a href="#" onclick="loadCustomsClearance()" data-tippy-content="Manage customs clearance">Customs Clearance</a></li>
+                <li><a href="#" onclick="loadSettings()" data-tippy-content="Adjust your app settings">Settings</a></li>
+            </ul>
+        </nav>
+        <div id="content-wrapper">
+            <aside id="tms-panel" class="side-panel">
+                <h2>TMS Management</h2>
+                <div id="tms-quick-actions">
+                    <button onclick="createNewShipment()" data-tippy-content="Create a new shipment">New Shipment</button>
+                    <button onclick="viewActiveShipments()" data-tippy-content="View all active shipments">Active Shipments</button>
+                    <button onclick="generateReports()" data-tippy-content="Generate TMS reports">Generate Reports</button>
+                </div>
+            </aside>
+            <main id="app">
+                <!-- Dynamic content will be loaded here -->
+            </main>
+            <aside id="api-panel" class="side-panel">
+                <h2>API Management</h2>
+                <div id="api-status" data-tippy-content="Current status of API connections">
+                    <span class="status-indicator"></span> API Status: <span id="api-status-text">Checking...</span>
+                </div>
+                <button onclick="refreshAPIConnections()" data-tippy-content="Refresh all API connections">Refresh Connections</button>
+                <button onclick="configureAPIs()" data-tippy-content="Configure API settings">Configure APIs</button>
+            </aside>
+        </div>
+    </div>
+    <canvas id="background-canvas"></canvas>
+    <div id="voice-command-indicator" data-tippy-content="Speak to activate voice commands">🎙️ Voice command ready</div>
+    <div id="ar-overlay">
+        <div id="ar-content"></div>
+    </div>
+    <div id="ai-assistant-chat">
+        <div id="chat-messages"></div>
+        <input type="text" id="ai-chat-input" placeholder="Ask the AI assistant...">
+    </div>
+    <div id="system-status" data-tippy-content="Current system status">System Status: <span id="status">Initializing...</span></div>
+    <div id="efficiency-meter" data-tippy-content="Overall efficiency of your freight operations">
+        Efficiency Level: <meter id="efficiency-level" min="0" max="100" value="0"></meter>
+    </div>
+    <div id="notification-center" data-tippy-content="Important system notifications">
+        Notifications: <span id="notification-status">No new notifications</span>
+    </div>
+    <button id="optimize-operations" onclick="optimizeOperations()" data-tippy-content="Automatically optimize your freight operations">Optimize Operations</button>
+    <div id="data-visualization-container"></div>
+    <div id="real-time-updates"></div>
+    <div id="user-metrics">
+        <div id="productivity-score" data-tippy-content="Your current productivity score">Productivity Score: --</div>
+        <div id="task-completion" data-tippy-content="Number of tasks completed today">Tasks Completed: --</div>
+        <div id="efficiency-rating" data-tippy-content="Your overall efficiency rating">Efficiency Rating: --%</div>
+    </div>
+    <button id="ai-chat-toggle" onclick="toggleAIChat()" data-tippy-content="Toggle AI assistant chat">💬</button>
+    <div id="quick-actions-panel" class="carousel">
+        <button class="carousel-button prev" onclick="carouselPrev()">❮</button>
+        <div class="carousel-content">
+            <button onclick="schedulePickup()" data-tippy-content="Schedule a new pickup">📅 Schedule Pickup</button>
+            <button onclick="trackShipment()" data-tippy-content="Track a specific shipment">🔍 Track Shipment</button>
+            <button onclick="viewAnalytics()" data-tippy-content="View detailed analytics">📊 View Analytics</button>
+            <button onclick="manageDangerousGoods()" data-tippy-content="Manage dangerous goods shipments">☢️ Dangerous Goods</button>
+            <button onclick="customsClearanceAssistant()" data-tippy-content="Get assistance with customs clearance">🛃 Customs Assistant</button>
+        </div>
+        <button class="carousel-button next" onclick="carouselNext()">❯</button>
+    </div>
+    <div id="context-sidebar-left" class="context-sidebar">
+        <!-- Dynamic content for left sidebar -->
+    </div>
+    <div id="context-sidebar-right" class="context-sidebar">
+        <!-- Dynamic content for right sidebar -->
+    </div>
+    <div id="3d-world-container">
+        <canvas id="3d-world"></canvas>
+    </div>
+    <div id="freight-forms-container">
+        <h2>Freight Forms</h2>
+        <div id="form-selector">
+            <select id="form-type">
+                <option value="">Select a form</option>
+                <option value="bol">Bill of Lading</option>
+                <option value="shipping-request">Shipping Request Form</option>
+                <option value="shipping-label">Shipping Label</option>
+                <option value="commercial-invoice">Commercial Invoice</option>
+                <option value="customs-declaration">Customs Declaration Form</option>
+                <option value="delivery-note">Delivery Note</option>
+                <option value="packing-list">Packing List</option>
+                <option value="pod">Proof of Delivery</option>
+                <option value="sli">Shipper's Letter of Instruction</option>
+                <option value="delivery-confirmation">Delivery Confirmation</option>
+                <option value="waybill">Waybill</option>
+                <option value="quick-pass">Quick Pass</option>
+                <option value="export-import-license">Export/Import License</option>
+                <option value="insurance-certificate">Insurance Certificate</option>
+            </select>
+        </div>
+        <div id="form-content">
+            <!-- Dynamic form content will be loaded here -->
+        </div>
+    </div>
+    <noscript>
+        <p>JavaScript is required to use the full functionality of FreightBooks Companion.</p>
+        <p>Please enable JavaScript to access all features.</p>
+    </noscript>
+    <script src="app.js"></script>
+    <script src="components/Animations.js"></script>
+    <script src="components/3DFreightVisualizer.js"></script>
+    <script src="components/VoiceCommands.js"></script>
+    <script src="components/ARFreightTracker.js"></script>
+    <script src="components/PerformanceTracker.js"></script>
+    <script src="components/DataAnalyzer.js"></script>
+    <script src="components/CustomsClearance.js"></script>
+    <script src="components/RouteOptimization.js"></script>
+    <script src="components/DangerousGoodsHandler.js"></script>
+    <script src="components/FreightForms.js"></script>
+    <script>
+        // ... (existing JavaScript code)
+
+        function loadCustomsClearance() {
+            const appDiv = document.getElementById('app');
+            appDiv.innerHTML = ''; // Clear existing content
+
+            const customsHeading = document.createElement('h1');
+            customsHeading.textContent = 'Customs Clearance Management';
+            appDiv.appendChild(customsHeading);
+
+            const customsDescription = document.createElement('p');
+            customsDescription.textContent = 'Manage customs clearance processes for your shipments.';
+            appDiv.appendChild(customsDescription);
+
+            const customsForm = document.createElement('form');
+            customsForm.id = 'customs-form';
+            customsForm.innerHTML = `
+                <h2>Customs Declaration</h2>
+                <label for="shipment-id">Shipment ID:</label>
+                <input type="text" id="shipment-id" required>
+                <label for="goods-description">Goods Description:</label>
+                <textarea id="goods-description" required></textarea>
+                <label for="value">Declared Value:</label>
+                <input type="number" id="value" required>
+                <label for="origin-country">Country of Origin:</label>
+                <select id="origin-country" required>
+                    <option value="">Select a country</option>
+                    <option value="US">United States</option>
+                    <option value="CN">China</option>
+                    <option value="JP">Japan</option>
+                    <!-- Add more countries as needed -->
+                </select>
+                <button type="submit">Submit Customs Declaration</button>
+            `;
+            appDiv.appendChild(customsForm);
+
+            customsForm.addEventListener('submit', handleCustomsSubmission);
+
+            updateContextSidebars('customs');
+            initTooltips();
+        }
+
+        function loadRouteOptimization() {
+            const appDiv = document.getElementById('app');
+            appDiv.innerHTML = ''; // Clear existing content
+
+            const routeHeading = document.createElement('h1');
+            routeHeading.textContent = 'Route Optimization';
+            appDiv.appendChild(routeHeading);
+
+            const routeDescription = document.createElement('p');
+            routeDescription.textContent = 'Optimize your shipping routes for maximum efficiency.';
+            appDiv.appendChild(routeDescription);
+
+            const routeForm = document.createElement('form');
+            routeForm.id = 'route-optimization-form';
+            routeForm.innerHTML = `
+                <h2>Route Parameters</h2>
+                <label for="start-point">Start Point:</label>
+                <input type="text" id="start-point" required>
+                <label for="end-point">End Point:</label>
+                <input type="text" id="end-point" required>
+                <label for="stops">Intermediate Stops:</label>
+                <textarea id="stops" placeholder="Enter one stop per line"></textarea>
+                <label for="optimization-priority">Optimization Priority:</label>
+                <select id="optimization-priority">
+                    <option value="time">Time</option>
+                    <option value="fuel">Fuel Efficiency</option>
+                    <option value="cost">Cost</option>
+                </select>
+                <button type="submit">Optimize Route</button>
+            `;
+            appDiv.appendChild(routeForm);
+
+            routeForm.addEventListener('submit', handleRouteOptimization);
+
+            updateContextSidebars('route');
+            initTooltips();
+        }
+
+        function loadDangerousGoodsManagement() {
+            const appDiv = document.getElementById('app');
+            appDiv.innerHTML = ''; // Clear existing content
+
+            const dangerousGoodsHeading = document.createElement('h1');
+            dangerousGoodsHeading.textContent = 'Dangerous Goods Management';
+            appDiv.appendChild(dangerousGoodsHeading);
+
+            const dangerousGoodsDescription = document.createElement('p');
+            dangerousGoodsDescription.textContent = 'Manage and track shipments containing dangerous goods.';
+            appDiv.appendChild(dangerousGoodsDescription);
+
+            const dangerousGoodsForm = document.createElement('form');
+            dangerousGoodsForm.id = 'dangerous-goods-form';
+            dangerousGoodsForm.innerHTML = `
+                <h2>Dangerous Goods Declaration</h2>
+                <label for="dg-shipment-id">Shipment ID:</label>
+                <input type="text" id="dg-shipment-id" required>
+                <label for="un-number">UN Number:</label>
+                <input type="text" id="un-number" required>
+                <label for="hazard-class">Hazard Class:</label>
+                <select id="hazard-class" required>
+                    <option value="">Select Hazard Class</option>
+                    <option value="1">Class 1 - Explosives</option>
+                    <option value="2">Class 2 - Gases</option>
+                    <option value="3">Class 3 - Flammable Liquids</option>
+                    <!-- Add more hazard classes -->
+                </select>
+                <label for="packing-group">Packing Group:</label>
+                <select id="packing-group">
+                    <option value="I">I</option>
+                    <option value="II">II</option>
+                    <option value="III">III</option>
+                </select>
+                <label for="proper-shipping-name">Proper Shipping Name:</label>
+                <input type="text" id="proper-shipping-name" required>
+                <button type="submit">Submit Dangerous Goods Declaration</button>
+            `;
+            appDiv.appendChild(dangerousGoodsForm);
+
+            dangerousGoodsForm.addEventListener('submit', handleDangerousGoodsSubmission);
+
+            // Create a container for quick view buttons
+            const quickViewContainer = document.createElement('div');
+            quickViewContainer.id = 'quick-view-container';
+            quickViewContainer.innerHTML = `
+                <button id="view-customs" class="quick-view-btn">Customs</button>
+                <button id="view-route" class="quick-view-btn">Route</button>
+                <button id="view-dangerous" class="quick-view-btn active">Dangerous Goods</button>
+            `;
+            appDiv.insertBefore(quickViewContainer, dangerousGoodsHeading);
+
+            // Add event listeners for quick view buttons
+            document.getElementById('view-customs').addEventListener('click', () => loadCustomsClearance());
+            document.getElementById('view-route').addEventListener('click', () => loadRouteOptimization());
+            document.getElementById('view-dangerous').addEventListener('click', () => loadDangerousGoodsManagement());
+
+            // Create a back button
+            const backButton = document.createElement('button');
+            backButton.textContent = 'Back to Dashboard';
+            backButton.addEventListener('click', loadDashboard);
+            appDiv.insertBefore(backButton, dangerousGoodsHeading);
+
+            updateContextSidebars('dangerous');
+            initTooltips();
+
+            // Add smooth transitions
+            appDiv.style.opacity = '0';
+            setTimeout(() => {
+                appDiv.style.transition = 'opacity 0.5s ease-in-out';
+                appDiv.style.opacity = '1';
+            }, 50);
+        }
+
+        function handleCustomsSubmission(event) {
+            event.preventDefault();
+            // Add logic to process customs declaration
+            console.log("Processing customs declaration...");
+            showNotification('Customs declaration submitted successfully!', 'success');
+            
+            // Integrate with FormContainer
+            const formContainer = new FormContainer();
+            formContainer.setFormType('customsdeclaration');
+            formContainer.handleFormChange(event.target.elements);
+        }
+
+        function handleRouteOptimization(event) {
+            event.preventDefault();
+            // Add logic to optimize route based on form inputs
+            console.log("Optimizing route...");
+            showNotification('Route optimization in progress...', 'info');
+            
+            // Integrate with AI suggestions
+            getAISuggestions('route', event.target.elements);
+        }
+
+        function handleDangerousGoodsSubmission(event) {
+            event.preventDefault();
+            // Add logic to process dangerous goods declaration
+            console.log("Processing dangerous goods declaration...");
+            showNotification('Dangerous goods declaration submitted for review.', 'warning');
+            
+            // Integrate with FormContainer
+            const formContainer = new FormContainer();
+            formContainer.setFormType('dangerousgoods');
+            formContainer.handleFormChange(event.target.elements);
+        }
+
+        function manageDangerousGoods() {
+            // Implementation for managing dangerous goods
+            console.log("Managing dangerous goods...");
+            loadDangerousGoodsManagement();
+            
+            // Integrate with AI suggestions
+            getAISuggestions('dangerousgoods');
+        }
+
+        function customsClearanceAssistant() {
+            // Implementation for customs clearance assistant
+            console.log("Opening customs clearance assistant...");
+            loadCustomsClearance();
+            
+            // Integrate with AI suggestions
+            getAISuggestions('customs');
+        }
+
+        function updateContextSidebars(context) {
+            const leftSidebar = document.getElementById('context-sidebar-left');
+            const rightSidebar = document.getElementById('context-sidebar-right');
+
+            // Clear existing content
+            leftSidebar.innerHTML = '';
+            rightSidebar.innerHTML = '';
+
+            // Update content based on context
+            switch(context) {
+                case 'customs':
+                    leftSidebar.innerHTML = `
+                        <h3>Customs Regulations</h3>
+                        <ul>
+                            <li>Import/Export Guidelines</li>
+                            <li>Tariff Codes</li>
+                            <li>Required Documentation</li>
+                        </ul>
+                    `;
+                    rightSidebar.innerHTML = `
+                        <h3>Recent Clearances</h3>
+                        <ul>
+                            <li>Shipment #12345 - Cleared</li>
+                            <li>Shipment #67890 - Pending</li>
+                            <li>Shipment #54321 - Delayed</li>
+                        </ul>
+                    `;
+                    break;
+                case 'route':
+                    leftSidebar.innerHTML = `
+                        <h3>Popular Routes</h3>
+                        <ul>
+                            <li>New York to Los Angeles</li>
+                            <li>Chicago to Miami</li>
+                            <li>Seattle to Dallas</li>
+                        </ul>
+                    `;
+                    rightSidebar.innerHTML = `
+                        <h3>Traffic Updates</h3>
+                        <ul>
+                            <li>I-95: Heavy congestion</li>
+                            <li>I-10: Construction delays</li>
+                            <li>I-5: Clear</li>
+                        </ul>
+                    `;
+                    break;
+                case 'dangerous':
+                    leftSidebar.innerHTML = `
+                        <h3>Hazard Classes</h3>
+                        <ul>
+                            <li>Class 1: Explosives</li>
+                            <li>Class 2: Gases</li>
+                            <li>Class 3: Flammable Liquids</li>
+                        </ul>
+                    `;
+                    rightSidebar.innerHTML = `
+                        <h3>Safety Protocols</h3>
+                        <ul>
+                            <li>Emergency Response Guide</li>
+                            <li>Spill Containment Procedures</li>
+                            <li>Personal Protective Equipment</li>
+                        </ul>
+                    `;
+                    break;
+                default:
+                    // Default content for sidebars
+                    leftSidebar.innerHTML = '<h3>Quick Links</h3>';
+                    rightSidebar.innerHTML = '<h3>System Status</h3>';
+            }
+
+            // Add transition effect to sidebars
+            leftSidebar.style.transition = 'opacity 0.3s ease-in-out';
+            rightSidebar.style.transition = 'opacity 0.3s ease-in-out';
+            leftSidebar.style.opacity = '0';
+            rightSidebar.style.opacity = '0';
+            setTimeout(() => {
+                leftSidebar.style.opacity = '1';
+                rightSidebar.style.opacity = '1';
+            }, 50);
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 3000);
+            }, 100);
+        }
+
+        function loadDashboard() {
+            const appDiv = document.getElementById('app');
+            appDiv.innerHTML = '<h1>Dashboard</h1><p>Welcome to the Logistics Management System</p>';
+            updateContextSidebars('default');
+        }
+
+        async function getAISuggestions(formType, data) {
+            try {
+                const response = await fetch('/api/ai/suggestions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ formType, data })
+                });
+                if (response.ok) {
+                    const suggestions = await response.json();
+                    displayAISuggestions(suggestions);
+                }
+            } catch (error) {
+                console.error('Error getting AI suggestions:', error);
+            }
+        }
+
+        function displayAISuggestions(suggestions) {
+            const aiAssistant = new AIAssistant({ suggestions });
+            const aiContainer = document.getElementById('ai-container');
+            aiContainer.innerHTML = '';
+            aiContainer.appendChild(aiAssistant.render());
+        }
+
+        // ... (rest of the JavaScript code)
+    </script>
+</body>
+</html>

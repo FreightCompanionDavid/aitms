@@ -1,0 +1,43 @@
+/* Integrations.css */
+
+/* Container for the integrations section */
+.integrations-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+}
+
+/* Header styling */
+.integrations-container h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Description styling */
+.integrations-container p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* List styling */
+.integration-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+/* List item styling */
+.integration-list li {
+    font-size: 18px;
+    color: #444;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Last list item without border */
+.integration-list li:last-child {
+    border-bottom: none;
+}

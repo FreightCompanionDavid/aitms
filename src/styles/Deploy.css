@@ -1,0 +1,152 @@
+/* Deploy.css */
+
+.deploy {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 20px 0;
+}
+
+.deploy h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.deploy-form {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.deploy-form label {
+    display: block;
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.deploy-form input,
+.deploy-form select,
+.deploy-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.deploy-form button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.deploy-form button:hover {
+    background-color: #0056b3;
+}
+
+.deploy-logs {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.deploy-logs h3 {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.deploy-logs ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.deploy-logs li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.deploy-logs li:last-child {
+    border-bottom: none;
+}
+
+.deploy-logs .loading,
+.deploy-logs .error {
+    font-size: 18px;
+    color: #999;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.progress {
+    height: 100%;
+    background-color: #4CAF50;
+    border-radius: 10px;
+    transition: width 0.5s ease-in-out;
+}
+
+button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.deploy-history {
+    margin-top: 20px;
+}
+
+.deploy-history h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.deploy-history ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.deploy-history li {
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.deploy-history li:last-child {
+    border-bottom: none;
+}

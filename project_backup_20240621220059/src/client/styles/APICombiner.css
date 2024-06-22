@@ -1,0 +1,74 @@
+.api-combiner {
+    font-family: 'Orbitron', sans-serif;
+    background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+    color: #fff;
+}
+
+.api-combiner h2 {
+    color: #ff00ff;
+    text-shadow: 0 0 10px #ff00ff;
+}
+
+.api-combiner textarea,
+.api-combiner select,
+.api-combiner button {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #ff00ff;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.api-combiner button {
+    background-color: #ff00ff;
+    color: #000;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.api-combiner button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px #ff00ff;
+}
+
+.api-selection {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.api-selection label {
+    display: flex;
+    align-items: center;
+    background-color: #333;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.api-selection input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+.suggestion,
+.interactive-example {
+    background-color: #222;
+    border: 1px solid #ff00ff;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+.error {
+    color: #ff0000;
+    background-color: rgba(255, 0, 0, 0.1);
+    border: 1px solid #ff0000;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 10px;
+}

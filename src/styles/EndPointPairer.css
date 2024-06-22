@@ -1,0 +1,81 @@
+.api-endpoint-pairing-tool {
+    font-family: 'Orbitron', sans-serif;
+    background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+}
+
+.api-endpoint-pairing-tool h1 {
+    color: #ff4500;
+    text-align: center;
+    font-size: 2.5em;
+    text-shadow: 0 0 10px rgba(255, 69, 0, 0.7);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.endpoint-lists {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.endpoint-lists > div {
+    width: 45%;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border-radius: 8px;
+    min-height: 300px;
+}
+
+.endpoint-lists h2 {
+    color: #00ff00;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.endpoint-item {
+    background: #333;
+    color: #fff;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    cursor: grab;
+    transition: all 0.3s ease;
+}
+
+.endpoint-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
+}
+
+.endpoint-item.paired {
+    background: #006400;
+}
+
+.save-button {
+    display: block;
+    margin: 20px auto 0;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    background: linear-gradient(45deg, #ff4500, #ff8c00);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.save-button:hover {
+    transform: scale(1.05) rotate(-2deg);
+    box-shadow: 0 0 20px rgba(255, 69, 0, 0.7);
+}

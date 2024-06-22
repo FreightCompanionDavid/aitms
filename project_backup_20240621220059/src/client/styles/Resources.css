@@ -1,0 +1,53 @@
+/* Resources.css */
+
+.resources {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 20px 0;
+}
+
+.resources h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.resources-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.resources-list li {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.resources-list li:last-child {
+    border-bottom: none;
+}
+
+.resources-list li h3 {
+    font-size: 20px;
+    color: #007bff;
+    margin-bottom: 5px;
+}
+
+.resources-list li p {
+    font-size: 16px;
+    color: #555;
+}
+
+.resources .loading,
+.resources .error {
+    font-size: 18px;
+    color: #999;
+    text-align: center;
+    margin-top: 20px;
+}

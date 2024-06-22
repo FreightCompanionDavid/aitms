@@ -1,0 +1,20 @@
+{
+  "name": "projrct",
+  "version": "1.0.0",
+  "description": "Are you ready to revolutionize your freight management? Look no further! FreightBooks Companion is here to blow your mind and streamline your operations like never before! 🤯",
+  "main": "3dvisualizer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.52.0"
+  }
+}

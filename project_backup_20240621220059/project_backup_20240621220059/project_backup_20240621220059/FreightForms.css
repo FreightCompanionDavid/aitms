@@ -1,0 +1,72 @@
+#freight-forms-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+#form-selector {
+    margin-bottom: 20px;
+}
+
+#form-selector select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+}
+
+#form-content form {
+    display: flex;
+    flex-direction: column;
+}
+
+#form-content label {
+    margin-top: 10px;
+}
+
+#form-content input, #form-content select, #form-content textarea {
+    margin-bottom: 10px;
+    padding: 5px;
+}
+
+#form-content button {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#form-content button:hover {
+    background-color: #0056b3;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="number"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form-group textarea {
+    height: 100px;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 5px;
+}

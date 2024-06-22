@@ -1,0 +1,62 @@
+/* AskAI Component Styles */
+
+.ask-ai {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ask-ai h1 {
+    font-size: 1.5rem;
+    color: #007bff;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.ask-ai form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ask-ai input {
+    width: 80%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.ask-ai button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.ask-ai button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.ask-ai button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.ask-ai .error {
+    color: red;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.ask-ai .response {
+    color: green;
+    margin-top: 1rem;
+    text-align: center;
+}

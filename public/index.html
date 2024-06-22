@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreightBooks Companion - Advanced Freight Management</title>
+    <meta name="description" content="Experience efficient and advanced freight management with FreightBooks Companion!">
+    <link rel="preload" href="dist/styles.css" as="style">
+    <link rel="preload" href="dist/vendor.js" as="script">
+    <link rel="preload" href="dist/app.js" as="script">
+    <link rel="stylesheet" href="dist/styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.example.com;">
+</head>
+<body>
+    <div id="loader" aria-label="Loading animation">
+        <div class="spinner"></div>
+        <div class="text">Loading FreightBooks Companion...</div>
+    </div>
+
+    <div id="app-container">
+        <!-- App content will be dynamically inserted here -->
+        <nav id="main-nav" aria-label="Main navigation">
+            <!-- Navigation menu items will be dynamically generated -->
+        </nav>
+
+        <div id="content-wrapper">
+            <aside id="tms-panel" class="side-panel" aria-label="TMS panel">
+                <!-- TMS panel content will be dynamically generated -->
+            </aside>
+
+            <main id="app">
+                <div id="dashboard" class="dashboard-container">
+                    <!-- Dashboard content will be dynamically generated -->
+                </div>
+            </main>
+
+            <aside id="api-panel" class="side-panel" aria-label="API panel">
+                <!-- API panel content will be dynamically generated -->
+            </aside>
+        </div>
+
+        <div id="ai-assistant-chat" aria-label="AI assistant chat">
+            <!-- AI assistant chat content will be dynamically generated -->
+        </div>
+
+        <div id="system-status" aria-live="polite">System Status: <span id="status">Initializing...</span></div>
+        <div id="efficiency-meter" aria-label="Efficiency meter">
+            Efficiency Level: <meter id="efficiency-level" min="0" max="100" value="0"></meter>
+        </div>
+        <div id="notification-center" aria-live="polite">
+            Notifications: <span id="notification-status">No new notifications</span>
+        </div>
+
+        <button id="optimize-operations" data-action="optimizeOperations">Optimize Operations</button>
+        <button id="ai-chat-toggle" data-action="toggleAIChat" aria-label="Toggle AI chat">💬</button>
+
+        <div id="quick-actions-panel" class="carousel" aria-label="Quick actions">
+            <!-- Quick actions carousel content will be dynamically generated -->
+        </div>
+
+        <div id="modal-container" class="modal" aria-modal="true" role="dialog">
+            <!-- Modal content will be dynamically generated -->
+        </div>
+
+        <footer role="contentinfo">
+            <!-- Footer content will be dynamically generated -->
+        </footer>
+    </div>
+
+    <noscript>
+        <p>JavaScript is required to use the full functionality of FreightBooks Companion.</p>
+        <p>Please enable JavaScript to access all features.</p>
+    </noscript>
+
+    <script src="dist/vendor.js" defer></script>
+    <script src="dist/app.js" defer></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered successfully:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

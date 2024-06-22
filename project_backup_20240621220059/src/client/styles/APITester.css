@@ -1,0 +1,73 @@
+/* APITester.css */
+
+.api-tester {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 20px 0;
+}
+
+.api-tester h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.api-tester form {
+    display: flex;
+    flex-direction: column;
+}
+
+.api-tester label {
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.api-tester input,
+.api-tester select,
+.api-tester textarea {
+    font-size: 14px;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.api-tester button {
+    font-size: 16px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.api-tester button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.api-tester .response,
+.api-tester .error {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.api-tester .response {
+    background-color: #e9ffe9;
+    border: 1px solid #b2d8b2;
+    color: #2d7a2d;
+}
+
+.api-tester .error {
+    background-color: #ffe9e9;
+    border: 1px solid #d8b2b2;
+    color: #7a2d2d;
+}

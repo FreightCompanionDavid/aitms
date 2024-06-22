@@ -1,0 +1,125 @@
+import io from 'socket.io-client';
+import { store } from '../store';
+
+class UserActivityTracker {
+    constructor(store) {
+        this.callback = null;
+        this.socket = null;
+        this.store = store;
+    }
+
+    start(callback) {
+        this.callback = callback;
+        const state = this.store.getState();
+        const token = state.auth.token;
+        this.socket = io('https://your-extreme-server.com', {
+            auth: {
+                token: token
+            }
+        });
+        this.trackNavigation();
+        this.trackAPICalls();
+        this.trackCodeEdits();
+        this.trackMouseMovements();
+        this.trackKeyboardShortcuts();
+        this.trackReduxActions();
+        this.trackFormSubmissions();
+
+        this.socket.on('connect_error', (error) => {
+            console.error('Socket connection error:', error);
+            // Implement retry logic or notify user
+        });
+    }
+
+    stop() {
+        if (this.socket) {
+            this.socket.disconnect();
+        }
+        // Remove event listeners
+        window.removeEventListener('popstate', this.navigationHandler);
+        document.removeEventListener('mousemove', this.mouseMovementHandler);
+        document.removeEventListener('keydown', this.keyboardShortcutHandler);
+        document.removeEventListener('submit', this.formSubmissionHandler);
+    }
+
+    trackNavigation() {
+        this.navigationHandler = () => {
+            this.emitActivity({ type: 'navigation', page: window.location.pathname });
+        };
+        window.addEventListener('popstate', this.navigationHandler);
+    }
+
+    trackAPICalls() {
+        const originalFetch = window.fetch;
+        window.fetch = (...args) => {
+            this.emitActivity({ type: 'api_call', endpoint: args[0], method: 'fetch' });
+            return originalFetch(...args);
+        };
+
+        if (window.axios) {
+            const originalAxios = window.axios;
+            window.axios = (...args) => {
+                this.emitActivity({ type: 'api_call', endpoint: args[0], method: 'axios' });
+                return originalAxios(...args);
+            };
+        }
+    }
+
+    trackCodeEdits() {
+        // This is now handled in the CodeEditor component
+    }
+
+    trackMouseMovements() {
+        let lastEmitTime = 0;
+        this.mouseMovementHandler = (e) => {
+            const now = Date.now();
+            if (now - lastEmitTime > 1000) { // Throttle to once per second
+                this.emitActivity({ type: 'mouse_move', x: e.clientX, y: e.clientY });
+                lastEmitTime = now;
+            }
+        };
+        document.addEventListener('mousemove', this.mouseMovementHandler);
+    }
+
+    trackKeyboardShortcuts() {
+        this.keyboardShortcutHandler = (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                this.emitActivity({ type: 'keyboard_shortcut', shortcut: 'save' });
+            }
+            // Add more shortcuts as needed
+        };
+        document.addEventListener('keydown', this.keyboardShortcutHandler);
+    }
+
+    trackReduxActions() {
+        this.store.subscribe(() => {
+            const action = this.store.getState().lastAction;
+            if (action) {
+                this.emitActivity({ type: 'redux_action', action: action.type });
+            }
+        });
+    }
+
+    trackFormSubmissions() {
+        this.formSubmissionHandler = (e) => {
+            if (e.target && e.target.tagName === 'FORM') {
+                this.emitActivity({ type: 'form_submission', formId: e.target.id || 'unknown' });
+            }
+        };
+        document.addEventListener('submit', this.formSubmissionHandler);
+    }
+
+    emitActivity(activity) {
+        const state = this.store.getState();
+        const enhancedActivity = {
+            ...activity,
+            timestamp: new Date().toISOString(),
+            userId: state.auth.user ? state.auth.user.id : null,
+            extremeMode: state.auth.extremeMode
+        };
+        this.callback(enhancedActivity);
+        this.socket.emit('user_activity', enhancedActivity);
+    }
+}
+
+export default UserActivityTracker;

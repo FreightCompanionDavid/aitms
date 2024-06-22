@@ -1,0 +1,58 @@
+/* Test.css */
+
+.test {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 20px 0;
+}
+
+.test h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.test ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.test ul li {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.test ul li strong {
+    font-size: 18px;
+    color: #007bff;
+}
+
+.test ul li span {
+    font-size: 16px;
+    color: #555;
+}
+
+.test ul li span.status-passed {
+    color: #28a745;
+}
+
+.test ul li span.status-failed {
+    color: #dc3545;
+}
+
+.test .loading,
+.test .error {
+    font-size: 16px;
+    color: #555;
+    text-align: center;
+    margin-top: 20px;
+}

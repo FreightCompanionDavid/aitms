@@ -1,0 +1,76 @@
+.visualize {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #1a1a1a;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(255, 69, 0, 0.1);
+    margin: 20px;
+}
+
+.visualize h1 {
+    font-size: 24px;
+    color: #ff4500;
+    margin-bottom: 20px;
+}
+
+.visualize canvas {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    margin-top: 20px;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-container {
+    text-align: center;
+    color: #ff0000;
+    background-color: #ff6347;
+    color: white;
+    padding: 20px;
+    border-radius: 4px;
+    margin-top: 20px;
+}
+
+.error-container button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #ff4500;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.error-container button:hover {
+    background-color: #ff6347;
+}

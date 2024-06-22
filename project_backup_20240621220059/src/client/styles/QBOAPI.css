@@ -1,0 +1,81 @@
+/* QBOAPI Component Styles */
+
+.qbo-api {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 20px 0;
+}
+
+.qbo-api h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.qbo-api h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #555;
+}
+
+.qbo-api ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.qbo-api li {
+    font-size: 16px;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.qbo-api li:last-child {
+    border-bottom: none;
+}
+
+.qbo-api .qbo-invoices,
+.qbo-api .qbo-expenses {
+    margin-bottom: 20px;
+}
+
+.qbo-api .qbo-invoices ul,
+.qbo-api .qbo-expenses ul {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.qbo-api .qbo-invoices li,
+.qbo-api .qbo-expenses li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.qbo-api .qbo-invoices li span,
+.qbo-api .qbo-expenses li span {
+    flex: 1;
+    text-align: center;
+}
+
+.qbo-api .qbo-invoices li span:first-child,
+.qbo-api .qbo-expenses li span:first-child {
+    text-align: left;
+}
+
+.qbo-api .qbo-invoices li span:last-child,
+.qbo-api .qbo-expenses li span:last-child {
+    text-align: right;
+}
+
+.qbo-api .loading,
+.qbo-api .error {
+    font-size: 18px;
+    color: #ff0000;
+    text-align: center;
+    margin-top: 20px;
+}

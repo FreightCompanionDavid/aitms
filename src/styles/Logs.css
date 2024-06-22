@@ -1,0 +1,40 @@
+.logs {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 20px 0;
+}
+
+.logs h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.logs ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.logs li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.logs li:last-child {
+    border-bottom: none;
+}
+
+.logs li strong {
+    color: #555;
+}
+
+.logs .loading,
+.logs .error {
+    font-size: 18px;
+    color: #999;
+    text-align: center;
+    margin-top: 20px;
+}

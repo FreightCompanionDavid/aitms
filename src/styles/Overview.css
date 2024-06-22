@@ -1,0 +1,62 @@
+/* Overview.css */
+
+.overview {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+.overview h1 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.overview-section {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.overview-section h2 {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.overview-section p {
+    font-size: 16px;
+    color: #000;
+}
+
+.overview-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.stat {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    flex: 1;
+    margin: 0 10px;
+}
+
+.stat h3 {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.stat p {
+    font-size: 16px;
+    color: #000;
+}

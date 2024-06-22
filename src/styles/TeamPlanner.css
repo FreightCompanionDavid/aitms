@@ -1,0 +1,75 @@
+/* TeamPlanner.css */
+
+.team-planner {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.team-planner h1 {
+    font-size: 28px;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.team-planner table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.team-planner th, .team-planner td {
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    text-align: left;
+    transition: background-color 0.3s ease;
+}
+
+.team-planner th {
+    background-color: #3498db;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.team-planner tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.team-planner tr:hover {
+    background-color: #e8f4f8;
+}
+
+.team-planner .loading, .team-planner .error {
+    text-align: center;
+    font-size: 1.4rem;
+    color: #e74c3c;
+    padding: 20px;
+    background-color: #fde2e2;
+    border-radius: 4px;
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .team-planner {
+        padding: 10px;
+    }
+    
+    .team-planner h1 {
+        font-size: 24px;
+    }
+    
+    .team-planner th, .team-planner td {
+        padding: 10px;
+        font-size: 14px;
+    }
+}

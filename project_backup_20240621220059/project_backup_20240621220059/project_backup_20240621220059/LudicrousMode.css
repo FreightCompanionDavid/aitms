@@ -1,0 +1,28 @@
+.ludicrous-mode {
+    transition: all 0.3s ease;
+}
+
+.ludicrous-mode.active {
+    animation: ludicrous-pulse 0.5s infinite alternate;
+}
+
+.ludicrous-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background: linear-gradient(45deg, rgba(255,0,0,0.1), rgba(0,0,255,0.1));
+    animation: ludicrous-overlay 5s infinite alternate;
+}
+
+@keyframes ludicrous-pulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+}
+
+@keyframes ludicrous-overlay {
+    0% { opacity: 0.5; }
+    100% { opacity: 0.8; }
+}

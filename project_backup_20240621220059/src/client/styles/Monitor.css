@@ -1,0 +1,82 @@
+/* Monitor.css */
+
+.monitor {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 20px 0;
+}
+
+.monitor h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.monitor-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.stat {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    flex: 1;
+    margin: 0 10px;
+}
+
+.stat h3 {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.stat p {
+    font-size: 16px;
+    color: #000;
+}
+
+.monitor-logs {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.monitor-logs h3 {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.monitor-logs ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.monitor-logs li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.monitor-logs li:last-child {
+    border-bottom: none;
+}
+
+.monitor-logs li strong {
+    color: #555;
+}
+
+.monitor .loading,
+.monitor .error {
+    font-size: 18px;
+    color: #999;
+    text-align: center;
+    margin-top: 20px;
+}

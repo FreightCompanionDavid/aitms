@@ -1,0 +1,68 @@
+class UserActivityTracker {
+    constructor() {
+        this.callback = null;
+        this.socket = null;
+    }
+
+    start(callback) {
+        this.callback = callback;
+        this.socket = io('https://your-extreme-server.com');
+        this.trackNavigation();
+        this.trackAPICalls();
+        this.trackCodeEdits();
+        this.trackMouseMovements();
+        this.trackKeyboardShortcuts();
+    }
+
+    stop() {
+        if (this.socket) {
+            this.socket.disconnect();
+        }
+        // Remove event listeners
+    }
+
+    trackNavigation() {
+        window.addEventListener('popstate', () => {
+            this.emitActivity({ type: 'navigation', page: window.location.pathname });
+        });
+    }
+
+    trackAPICalls() {
+        const originalFetch = window.fetch;
+        window.fetch = (...args) => {
+            this.emitActivity({ type: 'api_call', endpoint: args[0] });
+            return originalFetch(...args);
+        };
+    }
+
+    trackCodeEdits() {
+        // This is now handled in the CodeEditor component
+    }
+
+    trackMouseMovements() {
+        let lastEmitTime = 0;
+        document.addEventListener('mousemove', (e) => {
+            const now = Date.now();
+            if (now - lastEmitTime > 1000) { // Throttle to once per second
+                this.emitActivity({ type: 'mouse_move', x: e.clientX, y: e.clientY });
+                lastEmitTime = now;
+            }
+        });
+    }
+
+    trackKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                this.emitActivity({ type: 'keyboard_shortcut', shortcut: 'save' });
+            }
+            // Add more shortcuts as needed
+        });
+    }
+
+    emitActivity(activity) {
+        this.callback(activity);
+        this.socket.emit('user_activity', activity);
+    }
+}
+
+export default UserActivityTracker;
