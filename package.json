@@ -25,7 +25,7 @@
     "react-chartjs-2": "^3.0.4",
     "tippy.js": "^6.3.1",
     "gsap": "^3.9.1",
-    "@tensorflow/tfjs": "^3.18.0",
+    "@tensorflow/tfjs": "^4.0.0",
     "@tensorflow-models/face-landmarks-detection": "^1.0.2",
     "howler": "^2.2.3",
     "fingerprintjs2": "^2.1.0"
